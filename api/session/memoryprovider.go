@@ -36,23 +36,23 @@ type MemoryProvider struct {
     lock     sync.Mutex
 }
 
-func (mP *MemoryProvider) SessionInit(id string) (Session, error) {
+func (mP *MemoryProvider) SessionInit(id string) (Store, error) {
     mP.lock.Lock()
     defer mP.lock.Unlock()
-    newSessStore := &Store{
+    memoryStore := &MemoryStore{
         provider:     mP,
         id:           id,
         timeAccessed: time.Now(),
         value:        make(map[interface{}]interface{}, 0),
     }
-    element := mP.list.PushBack(newSessStore)
+    element := mP.list.PushBack(memoryStore)
     mP.mapStore[id] = element
-    return newSessStore, nil
+    return memoryStore, nil
 }
 
-func (mP *MemoryProvider) SessionRead(id string) (Session, error) {
+func (mP *MemoryProvider) SessionRead(id string) (Store, error) {
     if element, ok := mP.mapStore[id]; ok {
-        return element.Value.(*Store), nil
+        return element.Value.(*MemoryStore), nil
     } else {
         return nil, SIDNotFoundError
     }
@@ -76,9 +76,9 @@ func (mP *MemoryProvider) SessionGC(maxLifeTime int64) {
         if element == nil {
             break
         }
-        if (element.Value.(*Store).timeAccessed.Unix() + maxLifeTime) < time.Now().Unix() {
+        if (element.Value.(*MemoryStore).timeAccessed.Unix() + maxLifeTime) < time.Now().Unix() {
             mP.list.Remove(element)
-            delete(mP.mapStore, element.Value.(*Store).id)
+            delete(mP.mapStore, element.Value.(*MemoryStore).id)
         } else {
             break
         }
@@ -89,7 +89,7 @@ func (mP *MemoryProvider) SessionUpdate(id string) error {
     mP.lock.Lock()
     defer mP.lock.Unlock()
     if element, ok := mP.mapStore[id]; ok {
-        element.Value.(*Store).
+        element.Value.(*MemoryStore).
             timeAccessed = time.Now()
         mP.list.MoveToFront(element)
         return nil

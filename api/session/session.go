@@ -12,7 +12,7 @@ import (
 	"time"
 )
 
-type Session interface {
+type Store interface {
 	Set(key, value interface{}) error
 	Get(key interface{}) interface{}
 	Clear(key interface{}) error
@@ -20,8 +20,8 @@ type Session interface {
 }
 
 type Provider interface {
-	SessionInit(sid string) (Session, error)
-	SessionRead(sid string) (Session, error)
+	SessionInit(sid string) (Store, error)
+	SessionRead(sid string) (Store, error)
 	SessionUpdate(sid string) error // for fast GC and query
 	SessionDestroy(sid string) error
 	SessionGC(maxLifeTime int64)
@@ -60,19 +60,19 @@ func NewManager(provideName, cookieName string, maxLifeTime int64) (*Manager, er
 	return &Manager{provider: provider, cookieName: cookieName, maxLifeTime: maxLifeTime}, nil
 }
 
-func (manager *Manager) SessionStart(w http.ResponseWriter, r *http.Request) (session Session) {
+func (manager *Manager) SessionStart(w http.ResponseWriter, r *http.Request) (store Store) {
 	manager.lock.Lock()
 	defer manager.lock.Unlock()
 	cookie, err := r.Cookie(manager.cookieName)
 	if err == nil && cookie.Value != "" {
 		sid, _ := url.QueryUnescape(cookie.Value)
-		session, err = manager.provider.SessionRead(sid)
+		store, err = manager.provider.SessionRead(sid)
 		if err == nil {
-			return session
+			return store
 		}
 	}
 	sid := manager.generateSessionID()
-	session, err = manager.provider.SessionInit(sid)
+    store, err = manager.provider.SessionInit(sid)
 	if err != nil {
 		log.Println(err.Error())
 		return nil
@@ -85,17 +85,17 @@ func (manager *Manager) SessionStart(w http.ResponseWriter, r *http.Request) (se
 		MaxAge:   int(manager.maxLifeTime)}
 	http.SetCookie(w, cookie)
 
-	return session
+	return store
 }
 
-func (manager *Manager) SessionQuery(r *http.Request) (session Session) {
+func (manager *Manager) SessionQuery(r *http.Request) (store Store) {
 	cookie, err := r.Cookie(manager.cookieName)
 	if err != nil {
 		return nil
 	}
 	sid, _ := url.QueryUnescape(cookie.Value)
-	session, _ = manager.provider.SessionRead(sid)
-	return session
+    store, _ = manager.provider.SessionRead(sid)
+	return store
 }
 
 func (manager *Manager) SessionDestroy(w http.ResponseWriter, r *http.Request) {
