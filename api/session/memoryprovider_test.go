@@ -37,7 +37,7 @@ func init() {
     Mux = http.NewServeMux()
 }
 
-func ListenAndServe(quit chan bool) {
+func listenAndServe(quit chan bool) {
     server := http.Server{Addr: ":8080", Handler: Mux}
 
     Mux.HandleFunc("/shutdown/", func(w http.ResponseWriter, r *http.Request) {
@@ -53,7 +53,7 @@ func ListenAndServe(quit chan bool) {
     quit <- true
 }
 
-func SendRequest(method, url string, reader io.Reader, cookies []*http.Cookie) string {
+func sendRequest(method, url string, reader io.Reader, cookies []*http.Cookie) string {
     request, err := http.NewRequest(method, url, reader)
     // request.Header.Set("Content-Type", "application/json")
     if err != nil {
@@ -86,7 +86,7 @@ func SendRequest(method, url string, reader io.Reader, cookies []*http.Cookie) s
     return string(bodyBytes)
 }
 
-func GetRequest(url string) (string, []*http.Cookie) {
+func getRequest(url string) (string, []*http.Cookie) {
     response, err := http.Get(url)
     if err != nil {
         panic(err)
@@ -156,18 +156,18 @@ func TestBasic(t *testing.T) {
     }))
 
     quit := make(chan bool)
-    go ListenAndServe(quit)
+    go listenAndServe(quit)
 
-    _, cookies := GetRequest("http://localhost:8080/start-no-redirect/")
-    responseBody := SendRequest("GET", "http://localhost:8080/get/", nil, cookies)
+    _, cookies := getRequest("http://localhost:8080/start-no-redirect/")
+    responseBody := sendRequest("GET", "http://localhost:8080/get/", nil, cookies)
 
     assert.Equal(t, "Hello World | ", responseBody)
 
-    responseBody = SendRequest("GET", "http://localhost:8080/set/", nil, cookies)
+    responseBody = sendRequest("GET", "http://localhost:8080/set/", nil, cookies)
     assert.Contains(t, responseBody, "Hello World")
     assert.Contains(t, responseBody, "0.0.0")
 
-    responseBody = SendRequest("GET", "http://localhost:8080/clear/", nil, nil)
+    responseBody = sendRequest("GET", "http://localhost:8080/clear/", nil, nil)
     assert.Equal(t, "empty", responseBody)
 
     select {
