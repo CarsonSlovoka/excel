@@ -1,7 +1,7 @@
 package urls
 
 import (
-    "fmt"
+    "github.com/CarsonSlovoka/excel/app"
     "github.com/CarsonSlovoka/excel/app/server"
     "github.com/gorilla/mux"
 )
@@ -22,7 +22,7 @@ func ShowAllURL() {
         if err != nil {
             return err
         }
-        fmt.Printf("%v\n", urlPath)
+        app.LoggerSys.Printf("%v\n", urlPath)
         return nil
     })
     if err != nil {

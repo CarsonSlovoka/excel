@@ -1,23 +1,23 @@
 package app
 
+import (
+    "github.com/CarsonSlovoka/excel/app/install"
+    "log"
+)
+
 type about struct {
     ProgName string
     Version  string
     Author   string
 }
 
-var About *about
+var (
+    About *about
 
-const (
-    ProgName = "GreenViewer"
-    Author   = "Carson"
-    Version  = "0.0.0"
+    LoggerSys   *log.Logger
+    LoggerError *log.Logger
 )
 
 func init() {
-    About = &about{
-        ProgName,
-        Author,
-        Version,
-    }
+    install.InitConfigDir(ProgName)
 }
