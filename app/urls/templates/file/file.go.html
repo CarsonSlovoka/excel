@@ -1,0 +1,12 @@
+{{ template "base.go.html" . }}
+
+{{ define "site-header" }}
+  {{- range $css := .Params.CSSList -}}
+  {{- end -}}
+
+  {{- range $js := .Params.JSList -}}
+  {{- end -}}
+{{ end }}
+
+{{- define "site-body" -}}
+{{ end }}

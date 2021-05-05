@@ -9,7 +9,7 @@ type about struct {
 var About *about
 
 const (
-    ProgName = "excel.exe"
+    ProgName = "GreenViewer"
     Author   = "Carson"
     Version  = "0.0.0"
 )
