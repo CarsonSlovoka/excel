@@ -2,7 +2,7 @@ package utils
 
 import (
     "errors"
-    "github.com/stretchr/testify/assert" //
+    "github.com/stretchr/testify/assert"
     "testing"
     "text/template"
 )
