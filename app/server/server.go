@@ -15,9 +15,6 @@ var (
     SessionManger *session.Manager
 )
 
-func GetServer() *http.Server {
-    return &server
-}
 
 func init() {
     Mux = mux.NewRouter()

@@ -18,8 +18,7 @@ func init() {
         if os.IsNotExist(err) {
             continue
         }
-        // if time.Now().After(fileInfo.ModTime().AddDate(0, 0, 7)) {
-        if time.Now().After(fileInfo.ModTime().Add(10*time.Second)) {
+        if time.Now().After(fileInfo.ModTime().AddDate(0, 0, 7)) {
             // Remove the log file if it's not used for a while. We treat this as a not important log file.
             err = os.Remove(fPath)
             if err != nil {
