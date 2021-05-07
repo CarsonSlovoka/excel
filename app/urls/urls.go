@@ -7,29 +7,19 @@ import (
 	"net/http"
 )
 
-type Setting struct {
-	EnableBootstrap bool
-	EnableFontawesome bool
-	EnableJquery    bool
-}
-
-var (
-	SiteSetting Setting
-)
-
-func init() {
-	SiteSetting = Setting{
-		EnableBootstrap: true, EnableJquery: true, EnableFontawesome: true,
-	}
-}
-
 type htmlTemplate struct {
 	*template.Template
-	context map[string]interface{}
+	contextSet []Context
 }
 
 func (t *htmlTemplate) ServeHTTP(w http.ResponseWriter, r *http.Request) {
-	if err := t.Execute(w, t.context); err != nil {
+    ctx := Context{}
+    for _, curCtx := range t.contextSet {
+        for k, v := range curCtx {
+            ctx[k] = v
+        }
+    }
+	if err := t.Execute(w, ctx); err != nil {
 		log.Println(err)
 		w.WriteHeader(http.StatusBadRequest)
 		_, _ = w.Write([]byte("BadRequest\n"))
@@ -43,5 +33,5 @@ func NewTemplate(targetName string, fs fs.FS, patterns ...string) *htmlTemplate 
 	if err != nil {
 		log.Fatal(err)
 	}
-	return &htmlTemplate{ht, make(map[string]interface{})}
+	return &htmlTemplate{ht, nil}
 }
