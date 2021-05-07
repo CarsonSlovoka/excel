@@ -6,7 +6,20 @@
 
   {{- range $js := .Params.JSList -}}
   {{- end -}}
+
+  <script defer src="/static/js/file/file.js"></script>
 {{ end }}
 
 {{- define "site-body" -}}
+
+<article class="mt-3 container">
+  <section class="row offset-md-1">
+    {{- /*
+      https://developer.mozilla.org/en-US/docs/Web/HTML/Element/input/file
+    */ -}}
+    <label for="uploadFile" class="form-label">Select the file
+      <input class="form-control" type="file" id="uploadFile" accept="text/csv"/>
+    </label>
+  </section>
+</article>
 {{ end }}
