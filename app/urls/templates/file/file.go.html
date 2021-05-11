@@ -7,7 +7,7 @@
   {{- range $js := .Params.JSList -}}
   {{- end -}}
 
-  <script defer src="/static/js/file/file.js"></script>
+  <script defer type="module" src="/static/js/src/file/file.js"></script>
 {{ end }}
 
 {{- define "site-body" -}}
@@ -18,7 +18,7 @@
       https://developer.mozilla.org/en-US/docs/Web/HTML/Element/input/file
     */ -}}
     <label for="uploadFile" class="col-md-10 form-label">Select the file
-      <input class="form-control" type="file" id="uploadFile" accept="text/csv"/>
+      <input class="form-control" type="file" id="uploadFile" accept=".csv"/>
     </label>
   </section>
 

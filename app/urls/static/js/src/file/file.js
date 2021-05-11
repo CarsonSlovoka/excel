@@ -1,19 +1,5 @@
-function toBinary(string) {
-  // https://stackoverflow.com/a/67415709
-  const codeUnits = new Uint16Array(string.length);
-  for (let i = 0; i < codeUnits.length; i++) {
-    codeUnits[i] = string.charCodeAt(i);
-  }
-  return String.fromCharCode(...new Uint8Array(codeUnits.buffer));
-}
-
-function fromBinary(binary) {
-  const bytes = new Uint8Array(binary.length);
-  for (let i = 0; i < bytes.length; i++) {
-    bytes[i] = binary.charCodeAt(i);
-  }
-  return String.fromCharCode(...new Uint16Array(bytes.buffer));
-}
+import * as base64 from "../../pkg/encoding/base64.js"
+import * as node from "../../pkg/utils/node.js"
 
 function createBSTable(dataURL) {
   const div = document.getElementById('div-csv-data')
@@ -59,7 +45,6 @@ function createBSTable(dataURL) {
         headers.push(key)
       }
 
-
       // [refresh bs-table](https://github.com/wenzhixin/bootstrap-table/issues/64)
       const columns = headers.map(e => ({field: e, title: e}))
       table.bootstrapTable('refreshOptions',
@@ -78,6 +63,9 @@ function createBSTable(dataURL) {
 
 (
   () => {
+    const myDemoDiv = document.querySelector("div.test[data-test='demo']")
+    const svg = node.GetNode("svg", {id: "my-svg", style: "width:60vw; height:40vh;"})
+    myDemoDiv.replaceWith(svg)
     window.onload = () => {
       const inputFile = document.getElementById("uploadFile")
       inputFile.onchange = () => {
@@ -86,7 +74,7 @@ function createBSTable(dataURL) {
           return
         }
         const filename = inputValue.substring(inputValue.lastIndexOf('\\') + 1).split(".")[0] // get basename without extension
-        const filenameB64 = btoa(toBinary(filename)) // Ensure Chinese filename is working.
+        const filenameB64 = base64.Str2base64(filename) // Ensure Chinese filename is working.
 
         const xhr = new XMLHttpRequest()
         xhr.open("POST", filenameB64, true)
