@@ -36,14 +36,14 @@ func worksheetsHandlerFunc(w http.ResponseWriter, req *http.Request) {
         defer func() { _ = file.Close() }()
         // byteData, err := ioutil.ReadAll(file)
 
-        jsonObj, err := fileHelper.CSV2Json(file)
+        dataArray, err := fileHelper.CSV2Json(file)
         if err != nil {
             w.WriteHeader(http.StatusBadRequest)
             _, _ = w.Write([]byte(err.Error()))
             return
         }
-        // beautifulJsonByte, err := json.MarshalIndent(jsonObj, "", "  ")
-        jsonByte, err := json.Marshal(jsonObj)
+        // beautifulJsonByte, err := json.MarshalIndent(dataArray, "", "  ")
+        jsonByte, err := json.Marshal(dataArray)
 
         if err != nil {
             w.WriteHeader(http.StatusBadRequest)

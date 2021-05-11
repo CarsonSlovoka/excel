@@ -53,10 +53,10 @@ func CSV2Json(file io.Reader) ([]map[string]interface{}, error) {
     jsonString := strings.Join(jsonData, ",")
     jsonString = "[" + jsonString + "]"
 
-    var jsonObj []map[string]interface{}
-    if err := json.Unmarshal([]byte(jsonString), &jsonObj); err != nil {
+    var dataArray []map[string]interface{}
+    if err := json.Unmarshal([]byte(jsonString), &dataArray); err != nil {
         return nil, err
     }
-    return jsonObj, nil
+    return dataArray, nil
 
 }
