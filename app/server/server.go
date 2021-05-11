@@ -3,7 +3,7 @@ package server
 import (
     "context"
     "fmt"
-    "github.com/CarsonSlovoka/excel/api/session"
+    "github.com/CarsonSlovoka/excel/pkg/session"
     "github.com/gorilla/mux"
     "log"
     "net/http"
@@ -14,7 +14,6 @@ var (
     server        http.Server
     SessionManger *session.Manager
 )
-
 
 func init() {
     Mux = mux.NewRouter()

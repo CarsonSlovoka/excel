@@ -1,8 +1,8 @@
 package app
 
 import (
-    "github.com/CarsonSlovoka/excel/api/utils"
     "github.com/CarsonSlovoka/excel/app/install"
+    "github.com/CarsonSlovoka/excel/pkg/utils"
     "log"
     "os"
     "path/filepath"
