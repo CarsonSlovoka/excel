@@ -74,7 +74,7 @@ function createBSTable(dataURL) {
           return
         }
         const filename = inputValue.substring(inputValue.lastIndexOf('\\') + 1).split(".")[0] // get basename without extension
-        const filenameB64 = base64.Str2base64(filename) // Ensure Chinese filename is working.
+        const filenameB64 = base64.EncodeToString(filename) // Ensure Chinese filename is working.
 
         const xhr = new XMLHttpRequest()
         xhr.open("POST", filenameB64, true)

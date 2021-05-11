@@ -25,13 +25,13 @@ function fromBinary(binary) {
  *  - Str2base64("☸☹☺☻☼☾☿")
  * @see https://developer.mozilla.org/en-US/docs/Web/API/WindowOrWorkerGlobalScope/btoa#unicode_strings
  */
-export function Str2base64(str) {
+export function EncodeToString(str) {
   return btoa(toBinary(str))
 }
 
 
 /**
- * Convert string to the base64 format.
+ * Decode base64 string
  *
  * @param base64 {string}
  * @returns {string}
@@ -39,6 +39,6 @@ export function Str2base64(str) {
  *  - Base642Str("OCY5JjomOyY8Jj4mPyY=")
  * @see https://developer.mozilla.org/en-US/docs/Web/API/WindowOrWorkerGlobalScope/btoa#unicode_strings
  */
-export function Base642Str(base64) {
+export function DecodeString(base64) {
   return fromBinary(atob("OCY5JjomOyY8Jj4mPyY="))
 }
