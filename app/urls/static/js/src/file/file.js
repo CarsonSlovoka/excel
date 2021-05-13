@@ -74,12 +74,14 @@ function createBSTable(dataArray) {
     }
 
     // [refresh bs-table](https://github.com/wenzhixin/bootstrap-table/issues/64)
-    const columns = headers.map(e => ({field: e, title: e}))
+    const columns = headers.map(e => ({field: e, title: e, sortable:"true"}))
     table.bootstrapTable('refreshOptions',
       {
         columns: columns, // [{field: "Name", title: "名稱"}, {field: "Desc", title: "說明"}]
         // url: dataURL // You can use ``url`` instead of ``data``, but there is unnecessary since we already get all the data.
         data: dataArray,
+        height: 768,
+        uniqueId: headers[0],
         buttons: {
           btnUsersAdd: {
             text: 'Save',
