@@ -1,9 +1,8 @@
 package urls
 
 import (
-    "encoding/json"
+    "fmt"
     "github.com/CarsonSlovoka/excel/app/server"
-    fileHelper "github.com/CarsonSlovoka/excel/pkg/file"
     "net/http"
 )
 
@@ -21,36 +20,16 @@ func worksheetsHandlerFunc(w http.ResponseWriter, req *http.Request) {
         return
     }
 
-    fileHeader := req.MultipartForm.File["myUploadFile"][0]
-    // req.MultipartForm.Value
-
-    server.Mux.HandleFunc(req.URL.Path+"/data", func(w http.ResponseWriter, r *http.Request) {
-        w.Header().Add("Content-Type", "application/json")
-
-        file, err := fileHeader.Open()
-        if err != nil {
-            w.WriteHeader(http.StatusBadRequest)
-            _, _ = w.Write([]byte("Couldn't open the file"))
+    // fileHeader := req.MultipartForm.File["myUploadFile"][0]
+    value := req.MultipartForm.Value
+    if val, exists := value["uploadData"]; exists {
+        if len(val) == 0 {
             return
         }
-        defer func() { _ = file.Close() }()
-        // byteData, err := ioutil.ReadAll(file)
+        data := val[0]
+        fmt.Println(data)
+    }
 
-        dataArray, err := fileHelper.CSV2Json(file)
-        if err != nil {
-            w.WriteHeader(http.StatusBadRequest)
-            _, _ = w.Write([]byte(err.Error()))
-            return
-        }
-        // beautifulJsonByte, err := json.MarshalIndent(dataArray, "", "  ")
-        jsonByte, err := json.Marshal(dataArray)
-
-        if err != nil {
-            w.WriteHeader(http.StatusBadRequest)
-            _, _ = w.Write([]byte(err.Error()))
-        }
-        _, _ = w.Write(jsonByte)
-    })
 }
 
 func init() {

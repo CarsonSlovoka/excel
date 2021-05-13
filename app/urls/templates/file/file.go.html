@@ -7,7 +7,9 @@
   {{- range $js := .Params.JSList -}}
   {{- end -}}
 
+  <script defer type="module" src="/static/js/pkg/encoding/jquery.csv.min.js"></script>
   <script defer type="module" src="/static/js/src/file/file.js"></script>
+
 {{ end }}
 
 {{- define "site-body" -}}
