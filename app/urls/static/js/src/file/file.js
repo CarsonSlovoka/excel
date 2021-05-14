@@ -76,6 +76,7 @@ function createBSTable(dataArray) {
     const columns = headers.map(e => ({field: e, title: e, sortable: "true"}))
     columns.splice(0, 0,
       {checkbox: true, width: 64, align: 'center'}, // Add a checkbox to select the whole row.
+      // {field: UNIQUE_ID, title: "uid", visiable: false, sortable: true} // new column for UNIQUE_ID // It's ok if you aren't gonna show it to the user. Data still save on the datatable, no matter you set the filed or not.
     )
     table.bootstrapTable('refreshOptions',
       {
@@ -127,8 +128,35 @@ function createBSTable(dataArray) {
       }
     )
     // table.uniqueId = UNIQUE_ID // Add other attributes for bootstrap-table
+    table.on('click-cell.bs.table', function (event, field, value, rowObj, td) {
+      td = td[0]
+      if (td.getAttribute("contentEditable")) {
+        return
+      }
+      const index = Array.prototype.indexOf.call(td.parentNode.children, td)
+      td.contentEditable = "true"
+
+      td.addEventListener("keyup", (event) => {
+        clearTimeout($.data(this, 'timer'))
+        const id = rowObj[UNIQUE_ID]
+        const wait = setTimeout(saveChange, 1500, td, id, field) // delay after user types
+        $(this).data('timer', wait)
+      })
+    })
     table.bootstrapTable('refresh')
   }
+}
+
+function saveChange(td, id, field) {
+  // field: which column you want to update.
+  const bsTable = document.getElementById(IFRAME_ID).contentWindow.table
+  // const th = getTh(td, bsTable.attr("id"))
+  bsTable.bootstrapTable('updateCellByUniqueId', {id, field, value: td.innerHTML})
+}
+
+function getTh(td, tableID) {
+  const index = Array.prototype.indexOf.call(td.parentNode.children, td)
+  return document.getElementById(IFRAME_ID).contentWindow.document.querySelector(`#${tableID} th:nth-child( ${(index + 1)} )`)
 }
 
 (
