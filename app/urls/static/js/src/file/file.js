@@ -2,6 +2,7 @@ import * as base64 from "../../pkg/encoding/base64.js"
 import {ReadFile} from "../../pkg/io/ioutil.js"
 
 const IFRAME_ID = "iframe-bootstrap-table"
+const UNIQUE_ID = "__id__"
 
 function removeExtraSpace(stringData) {
   stringData = stringData.replace(/,( *)/gm, ",")  // remove extra space
@@ -61,9 +62,6 @@ function createBSTable(dataArray) {
     const TABLE = iframeCtxWin.TABLE
     const table = iframeCtxWin.table // iframeCtxWin.[my-variable] // $("#iframe-bootstrap-table").contents().find(`[id=${TABLE_ID}]`) bootstrap-table導入的時候table就會消失會取不到
 
-    // TABLE.setAttribute("data-unique-id", "id")
-    // TABLE.setAttribute("data-buttons", "buttons")
-
     if (dataArray.length === 0) {
       return
     }
@@ -72,17 +70,43 @@ function createBSTable(dataArray) {
     for (const [key, value] of Object.entries(firstObj)) {
       headers.push(key)
     }
+    dataArray = dataArray.map((obj, idx) => (obj[UNIQUE_ID] = idx, obj)) // add serial number
 
     // [refresh bs-table](https://github.com/wenzhixin/bootstrap-table/issues/64)
-    const columns = headers.map(e => ({field: e, title: e, sortable:"true"}))
+    const columns = headers.map(e => ({field: e, title: e, sortable: "true"}))
+    columns.splice(0, 0,
+      {checkbox: true, width: 64, align: 'center'}, // Add a checkbox to select the whole row.
+    )
     table.bootstrapTable('refreshOptions',
       {
         columns: columns, // [{field: "Name", title: "名稱"}, {field: "Desc", title: "說明"}]
         // url: dataURL // You can use ``url`` instead of ``data``, but there is unnecessary since we already get all the data.
         data: dataArray,
         height: 768,
-        uniqueId: headers[0],
-        buttons: {
+        uniqueId: UNIQUE_ID, // Using the ``headers[0]`` is not a great idea, so I create a column(__id__) instead of it. // data-unique-id
+        buttons: { // data-buttons
+          btnDeleteSelect: {
+            text: 'Delete',
+            icon: 'fa-trash-alt',
+            attributes: {
+              style: 'color:#82c91e',
+              title: 'Delete all selection data'
+            },
+            event: {
+              'click': () => {
+                dataArray = table.bootstrapTable('getSelections')
+                const ids = []
+                dataArray.forEach(obj => {
+                    ids.push(obj[UNIQUE_ID])
+                  }
+                )
+                table.bootstrapTable('remove', {
+                  field: UNIQUE_ID,
+                  values: ids,
+                })
+              }
+            }
+          },
           btnUsersAdd: {
             text: 'Save',
             icon: 'fa-save',
@@ -102,6 +126,7 @@ function createBSTable(dataArray) {
         }
       }
     )
+    // table.uniqueId = UNIQUE_ID // Add other attributes for bootstrap-table
     table.bootstrapTable('refresh')
   }
 }
