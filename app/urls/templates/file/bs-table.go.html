@@ -1,14 +1,20 @@
 {{ template "base.go.html" . }}
 
 {{ define "site-header" }}
-  <!-- bootstrap-table-->
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-table/1.18.3/bootstrap-table.min.css" integrity="sha512-5RNDl2gYvm6wpoVAU4J2+cMGZQeE2o4/AksK/bi355p/C31aRibC93EYxXczXq3ja2PJj60uifzcocu2Ca2FBg==" crossorigin="anonymous" />
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-table/1.18.3/bootstrap-table.min.js" integrity="sha512-Wm00XTqNHcGqQgiDlZVpK4QIhO2MmMJfzNJfh8wwbBC9BR0FtdJwPqDhEYy8jCfKEhWWZe/LDB6FwY7YE9QhMg==" crossorigin="anonymous"></script>
 
-  <!--bootstrap-table-lanuage-->
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-table/1.18.3/bootstrap-table-locale-all.min.js" integrity="sha512-1PCRWIvrSQaZjCRWaa0GHWKr1jQA8u79VnIvkAme6BKeoNWe5N89peawTXdVp+kukb8rzNsEY89ocMJqVivdSA==" crossorigin="anonymous"></script>
-  <!--bootstrap-table-export-->
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-table/1.18.3/extensions/export/bootstrap-table-export.min.js" integrity="sha512-cAMZL39BuY4jWHUkLWRS+TlHzd/riowdz6RNNVI6CdKRQw1p1rDn8n34lu6pricfL0i8YXeWQIDF5Xa/HBVLRg==" crossorigin="anonymous"></script>
+  <!-- bootstrap -->
+  <link href="https://netdna.bootstrapcdn.com/bootstrap/3.0.0/css/bootstrap.min.css" rel="stylesheet">
+  <script src="https://netdna.bootstrapcdn.com/bootstrap/3.0.0/js/bootstrap.min.js"></script>
+
+  <!-- bootstrap-table-->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-table/1.17.1/bootstrap-table.min.css"/>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-table/1.17.1/bootstrap-table.min.js"></script>
+
+    <!--bootstrap-table-lanuage-->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-table/1.17.1/bootstrap-table-locale-all.min.js"></script>
+
+    <!--bootstrap-table-export-->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-table/1.17.1/extensions/export/bootstrap-table-export.min.js"></script>
 
   <!-- export of PNG (screenshots) -->
   <script src="https://cdn.jsdelivr.net/npm/es6-promise@4.2.8/dist/es6-promise.auto.min.js" integrity="sha256-Xxrdry6fWSKu1j2ALyuK/gHFQ+2Bp76ZrR6f3QXI47Y=" crossorigin="anonymous"></script>
@@ -16,6 +22,11 @@
 
   <!-- If you want to export, then you must import this. -->
   <script src="https://cdn.jsdelivr.net/npm/tableexport.jquery.plugin@1.10.22/tableExport.min.js" integrity="sha256-Dsris8trQzzQXIM6PgMzSugaNyUacxaR9o2VrJalh6Y=" crossorigin="anonymous"></script>
+
+  <!-- extensions: editable -->
+  <link href="//cdnjs.cloudflare.com/ajax/libs/x-editable/1.5.0/bootstrap3-editable/css/bootstrap-editable.css" rel="stylesheet"/>
+  <script src="//cdnjs.cloudflare.com/ajax/libs/x-editable/1.5.0/bootstrap3-editable/js/bootstrap-editable.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-table/1.17.1/extensions/editable/bootstrap-table-editable.min.js"></script>
 
   <style>
     html {
@@ -55,27 +66,28 @@
       color: white;
     }
 
-    /* fixed header */
-    /* https://stackoverflow.com/a/63412885 */
-    thead, tbody tr {
-      display: table;
-      width: 100%;
-      table-layout: fixed;
-    }
-    tbody {
-      display: block;
-      overflow-y: auto;
-      table-layout: fixed;
-      max-height: 512px; /* 不可以用%，要有這個overflow-y才會有作用。此外數值也不設定的太大，這樣才可以控制在一個主頁面(不需要滾動) */
+    .dropdown-toggle:after {
+      content:none!important
     }
 
-    td { /* 截斷所有過長的文字 */
-      word-break: break-all;
+    /* override bootstrap primary */
+    .btn-primary {
+      background-color: #004a88;
+      border-color: #004a88;
     }
+
+    .btn {
+      height: 2.2rem
+    }
+
   </style>
 {{ end }}
 
 {{- define "site-body" -}}
+  <div id="toolbar">
+    <!-- <button type="button" class="btn btn-default btn-sm"><i class="far fa-thumbs-up"></i></button> -->
+  </div>
+
   <table id="bs-table" class="table table-striped table-blue"
          data-toggle="table"
          data-search="true"
@@ -94,7 +106,7 @@
          data-export-types='["csv", "json", "excel", "doc", "sql", "png"]'>
   </table>
 
-  <script defer>
+  <script>
     var TABLE = document.querySelector("table") // get the first item
     var TABLE_ID = TABLE.getAttribute("id")
     var table = $(`#${TABLE_ID}`)
