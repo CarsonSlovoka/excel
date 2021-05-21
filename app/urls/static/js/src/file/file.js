@@ -124,6 +124,10 @@ class BSTable {
       )
       // table.uniqueId = UNIQUE_ID // Add other attributes for bootstrap-table
       this.table.bootstrapTable('refresh')
+      this.table.highlight($(".search.bs.table").val())
+      this.table.on('search.bs.table', (e, text) => {
+        this.table.highlight(text)
+      })
     }
   }
 
