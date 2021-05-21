@@ -7,14 +7,14 @@
   <script src="https://netdna.bootstrapcdn.com/bootstrap/3.0.0/js/bootstrap.min.js"></script>
 
   <!-- bootstrap-table-->
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-table/1.17.1/bootstrap-table.min.css"/>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-table/1.17.1/bootstrap-table.min.js"></script>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-table/1.17.1/bootstrap-table.min.css" integrity="sha512-zfridm8+ad8KSyxzl1REhqDP5975y8Q0AYaF22bcVGOnaVxlekxODmCGu0TP+Kbk3JbiNK5ENTHs7pT+yf+rBA==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-table/1.17.1/bootstrap-table.min.js" integrity="sha512-KtafFo5oE7fpMVyO/gXFnwsAXeGwl8Kxyikp1SCtMc+mXrvzO7WP1Zs70gSNmkcrBd9PS3byB/HFKvAVKtTWdg==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
 
     <!--bootstrap-table-lanuage-->
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-table/1.17.1/bootstrap-table-locale-all.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-table/1.17.1/bootstrap-table-locale-all.min.js" integrity="sha512-y/2Yags0sycip8KsAjHSB7+MSKK175rFyF4xi0+asdxz1VfbQLV0oE2FImw3BaqzpIm45lDoAnQa8Q7gRRM0yQ==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
 
     <!--bootstrap-table-export-->
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-table/1.17.1/extensions/export/bootstrap-table-export.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-table/1.17.1/extensions/export/bootstrap-table-export.min.js" integrity="sha512-99lNtbE6F2tY51EwKoGAvsXQ0i8S3NfhMZ+BTTu0+wAVXyv1zhNnd5WB+1x1nvPpDmXWpwXZlpfKyZgd8WLRaA==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
 
   <!-- export of PNG (screenshots) -->
   <script src="https://cdn.jsdelivr.net/npm/es6-promise@4.2.8/dist/es6-promise.auto.min.js" integrity="sha256-Xxrdry6fWSKu1j2ALyuK/gHFQ+2Bp76ZrR6f3QXI47Y=" crossorigin="anonymous"></script>
@@ -26,7 +26,7 @@
   <!-- extensions: editable -->
   <link href="//cdnjs.cloudflare.com/ajax/libs/x-editable/1.5.0/bootstrap3-editable/css/bootstrap-editable.css" rel="stylesheet"/>
   <script src="//cdnjs.cloudflare.com/ajax/libs/x-editable/1.5.0/bootstrap3-editable/js/bootstrap-editable.min.js"></script>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-table/1.17.1/extensions/editable/bootstrap-table-editable.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-table/1.17.1/extensions/editable/bootstrap-table-editable.min.js" integrity="sha512-B3suAulTs/tNVnNfCxw1OwToFUG7ODf0dFfOd+M/xok3ZNpeudsT5cqTt+vp3SEJpi3hmAmi9yF06Ne0v8Hl2A==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
 
   <style>
     html {
@@ -110,5 +110,17 @@
     var TABLE = document.querySelector("table") // get the first item
     var TABLE_ID = TABLE.getAttribute("id")
     var table = $(`#${TABLE_ID}`)
+
+    function DeleteItem(curID) {
+      if (!confirm('Are you sure you want to delete this item?')) {
+        return
+      }
+
+      const ids = [curID]
+      table.bootstrapTable('remove', {
+        field: table.uniqueId,
+        values: ids,
+      })
+    }
   </script>
 {{end}}

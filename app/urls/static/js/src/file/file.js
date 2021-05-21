@@ -71,6 +71,7 @@ class BSTable {
       // const TABLE = iframeCtxWinDoc.getElementById(TABLE_ID)
       // this.TABLE = iframeCtxWin.TABLE
       this.table = iframeCtxWin.table // iframeCtxWin.[my-variable] // $("#iframe-bootstrap-table").contents().find(`[id=${TABLE_ID}]`) bootstrap-table導入的時候table就會消失會取不到
+      this.table.uniqueId = UNIQUE_ID
 
       if (this.dataArray.length === 0) {
         return
@@ -83,12 +84,15 @@ class BSTable {
       this.dataArray = this.dataArray.map((obj, idx) => (obj[UNIQUE_ID] = idx, obj)) // add serial number
 
       // [refresh bs-table](https://github.com/wenzhixin/bootstrap-table/issues/64)
-      const columns = headers.map(e => ({field: e, title: e, sortable: "true",
+      const columns = headers.map(e => ({
+        field: e, title: e, sortable: "true",
         editable: {
           type: 'text',
           title: e,
           emptytext: "",
-          validate: function(v) { if(!v) return "You can't set the null value on this column" },
+          validate: function (v) {
+            if (!v) return "You can't set the null value on this column"
+          },
         }
       }))
       columns.splice(0, 0,
@@ -96,11 +100,11 @@ class BSTable {
         // {field: UNIQUE_ID, title: "uid", visiable: false, sortable: true} // new column for UNIQUE_ID // It's ok if you aren't gonna show it to the user. Data still save on the datatable, no matter you set the filed or not.
       )
       columns.push({
-        field: "tableAction", title: "Action", align: "center", width:64,
+        field: "tableAction", title: "Action", align: "center", width: 64,
         formatter: (value, row, index, field) => {
           const curID = row[UNIQUE_ID]
           return [
-            `<button type="button" class="btn btn-default btn-sm" onclick="deleteItem(${curID})">`,
+            `<button type="button" class="btn btn-default btn-sm" onclick="DeleteItem(${curID})">`,
             `<span class="glyphicon glyphicon-trash"></span>`,
             `</button>`
           ].join('')
@@ -140,6 +144,10 @@ class BSTable {
         },
         event: {
           'click': () => {
+            if (!confirm('Are you sure you want to delete all selection data?')) {
+              return
+            }
+
             const selectDataArray = this.table.bootstrapTable('getSelections')
             const ids = []
             selectDataArray.forEach(obj => {
@@ -183,18 +191,6 @@ class BSTable {
       button.appendChild(icon)
       divToolbar.appendChild(button)
     }
-  }
-
-  deleteItem(curID) {
-    if (!confirm('Are you sure you want to delete this item?')) {
-      return
-    }
-
-    const ids = [curID]
-    this.table.bootstrapTable('remove', {
-      field: UNIQUE_ID,
-      values: ids,
-    })
   }
 }
 
