@@ -124,7 +124,7 @@ class BSTable {
       )
       // table.uniqueId = UNIQUE_ID // Add other attributes for bootstrap-table
       this.table.bootstrapTable('refresh')
-      this.table.highlight($(".search.bs.table").val())
+      this.table.highlight($(".search.bs.table").val()) // jquery.highlight-5.min.js
       this.table.on('search.bs.table', (e, text) => {
         this.table.highlight(text)
       })
@@ -216,7 +216,7 @@ class BSTable {
 
         promise.then(fileContent => {
           fileContent = removeExtraSpace(fileContent)
-          const dataArray = $.csv.toObjects(fileContent)
+          const dataArray = $.csv.toObjects(fileContent) // jquery.csv.min.js
           const bsTable = new BSTable(dataArray)
         })
       }
