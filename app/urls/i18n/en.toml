@@ -1,0 +1,8 @@
+[Author]
+other="{{.Author}}"
+
+[Version]
+other="{{.Version}}"
+
+[AskDeleteItem]
+other="Are you sure you want to delete this item?"

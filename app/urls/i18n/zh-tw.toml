@@ -1,0 +1,8 @@
+[Author]
+other="{{.Author}}"
+
+[Version]
+other="{{.Version}}"
+
+[AskDeleteItem]
+other="您確定要刪除此項目嗎？"

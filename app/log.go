@@ -2,6 +2,7 @@ package app
 
 import (
     "github.com/CarsonSlovoka/excel/app/install"
+    osPlugin "github.com/CarsonSlovoka/excel/pkg/os"
     "github.com/CarsonSlovoka/excel/pkg/utils"
     "log"
     "os"
@@ -10,9 +11,16 @@ import (
 )
 
 func init() {
-    logSysFilePath := filepath.Join(install.Path.ConfigDir, "sys.log")
-    logErrFilePath := filepath.Join(install.Path.ConfigDir, "error.log")
+    initLog()
+}
+
+func initLog() {
+    logSysFilePath := filepath.Join(install.Path.ConfigDir, "log/sys.log")
+    logErrFilePath := filepath.Join(install.Path.ConfigDir, "log/error.log")
+
     for _, fPath := range []string{logErrFilePath, logSysFilePath} {
+
+        osPlugin.MustMkdirAll(filepath.Dir(fPath))
 
         fileInfo, err := os.Stat(fPath)
         if os.IsNotExist(err) {
