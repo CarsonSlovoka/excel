@@ -148,7 +148,7 @@ class BSTable {
         },
         event: {
           'click': () => {
-            if (!confirm('Are you sure you want to delete all selection data?')) {
+            if (!confirm(i18n.AskDeleteItem)) {
               return
             }
 

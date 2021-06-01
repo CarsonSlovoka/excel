@@ -3,6 +3,7 @@ package ck
 import (
     "github.com/gorilla/securecookie"
     "net/http"
+    "time"
 )
 
 type SafeCookie struct {
@@ -41,6 +42,7 @@ func (sc *SafeCookie) SetSecureCookie(cookie *http.Cookie, mapValue CookieValueM
     }
 }
 
+// Get previous data if the value is nil will new an empty data.
 func (sc *SafeCookie) GetSecureCookieValue(r *http.Request, cookieName string) (cookieValue CookieValueMap, err error) {
     var ck *http.Cookie
     ck, err = r.Cookie(cookieName)
@@ -51,5 +53,31 @@ func (sc *SafeCookie) GetSecureCookieValue(r *http.Request, cookieName string) (
             &cookieValue)
         return cookieValue, err
     }
-    return
+    return make(CookieValueMap, 0), err
+}
+
+func (sc *SafeCookie) UpdateSecureCookie(writer http.ResponseWriter, request *http.Request, cookieName string,
+    updateMap map[string]interface{},
+    path string, expires *time.Time,
+) error {
+    /*
+       expires= time.Now().AddDate(0, 1, 0)
+    */
+    cookieValueMap, _ := sc.GetSecureCookieValue(request, cookieName)
+
+    for key, val := range updateMap {
+        cookieValueMap[key] = val
+    }
+
+    cookie := NewCookie(cookieName)
+    if path == "" {
+        cookie.Path = "/"
+    }
+    if expires != nil {
+        cookie.Expires = *expires
+    }
+
+    sc.SetSecureCookie(cookie, cookieValueMap, writer)
+    return nil
+
 }

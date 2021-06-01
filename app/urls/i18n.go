@@ -20,7 +20,7 @@ import (
 //go:embed i18n
 var i18nDirFS embed.FS
 
-func init() {
+func initI18nJS() {
     bundle := i18n.NewBundle(language.English)
     bundle.RegisterUnmarshalFunc("toml", toml.Unmarshal)
     i18nDir := "i18n"
@@ -47,8 +47,10 @@ func init() {
     }
 
     langTmpl := &i18nPlugin.LangTmpl{Bundle: bundle}
-    expr := `{{range .MessageSet}}
-var {{.}} = "{{i18n .}}"{{end}}`
+    expr := `var i18n = {
+{{range .MessageSet}} {{.}}: "{{i18n .}}",
+{{end}}
+}`
 
     i18nRouter := server.Mux.PathPrefix("/i18n/").Subrouter()
 
@@ -58,6 +60,8 @@ var {{.}} = "{{i18n .}}"{{end}}`
     for targetLang, _ := range messageFileMap {
         i18nRouter.HandleFunc(fmt.Sprintf("/%s/", targetLang),
             func(writer http.ResponseWriter, request *http.Request) {
+                writer.Header().Set("Content-Type", "application/javascript; charset=utf-8")
+
                 matchSlice := regex.FindStringSubmatch(request.URL.Path)
                 if matchSlice == nil {
                     return
@@ -70,10 +74,11 @@ var {{.}} = "{{i18n .}}"{{end}}`
                 }
 
                 langTmpl.MustCompile(curLang, expr, map[string]interface{}{
-                    "Version": app.Version,
+                    "Version": app.Version, // i18n/en.toml
                     "Author":  app.Author,
                 })
 
+                // io.MultiWriter(writer, os.Stdout)
                 langTmpl.MustRender(writer, i18nPlugin.Context{
                     "MessageSet": messageIDSet,
                 })

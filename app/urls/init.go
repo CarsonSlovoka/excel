@@ -8,6 +8,7 @@ import (
 
 func InitURLs() {
     initStaticFS() // set static dir
+    initI18nJS()
     serveSingleFile("/favicon.ico", "static/app.ico")
     initSystemURL()
     initHomeURL()

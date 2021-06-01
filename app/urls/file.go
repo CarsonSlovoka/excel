@@ -16,13 +16,14 @@ var fsTemplates embed.FS
 
 func initFileURL() {
     ht := NewTemplate("file.go.html", fsTemplates, "templates/base.go.html", "templates/file/file.go.html")
-    ht.contextSet = append(ht.contextSet, BaseContext, Context{
-        "Params": struct {
-            CSSList []string
-            JSList  []string
-        }{},
-    })
     server.Mux.HandleFunc("/file/", func(w http.ResponseWriter, r *http.Request) {
+        ht.contextSet = append([]Context{}, BaseContext, getLangContext(r), Context{
+            "Params": struct {
+                CSSList []string
+                JSList  []string
+            }{},
+        })
+
         ht.ServeHTTP(w, r)
     },
     ).Methods("GET")

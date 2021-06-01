@@ -20,6 +20,7 @@ func (sfs StaticFS) Open(path string) (fs.File, error) {
     if utils.In(filepath.Ext(path), []string{".rst", ".md"}) {
         return nil, &fs.PathError{Op: "open", Path: path, Err: fs.ErrNotExist}
     }
+
     return sfs.FS.Open(path)
 }
 
