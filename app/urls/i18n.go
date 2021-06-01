@@ -20,7 +20,14 @@ import (
 //go:embed i18n
 var i18nDirFS embed.FS
 
-func initI18nJS() {
+type i18nObject struct {
+    *i18n.Bundle
+    messageFileMap map[string]*i18n.MessageFile
+}
+
+var i18nObj *i18nObject
+
+func newI18nObj() *i18nObject {
     bundle := i18n.NewBundle(language.English)
     bundle.RegisterUnmarshalFunc("toml", toml.Unmarshal)
     i18nDir := "i18n"
@@ -45,8 +52,19 @@ func initI18nJS() {
         messageFile, err := bundle.ParseMessageFileBytes(bytesLang, langFilePath)
         messageFileMap[strings.TrimSuffix(filename, filepath.Ext(filename))] = messageFile
     }
+    return &i18nObject{bundle, messageFileMap}
+}
 
-    langTmpl := &i18nPlugin.LangTmpl{Bundle: bundle}
+// init i18nObj
+func init() {
+    if i18nObj != nil {
+        return
+    }
+    i18nObj = newI18nObj()
+}
+
+func initI18nJS() {
+    langTmpl := &i18nPlugin.LangTmpl{Bundle: i18nObj.Bundle}
     expr := `var i18n = {
 {{range .MessageSet}} {{.}}: "{{i18n .}}",
 {{end}}
@@ -57,7 +75,7 @@ func initI18nJS() {
     regex := regexp.MustCompile("/i18n/(?P<lang>[a-z]{2}|[a-z]{2}-[a-z]{2})/") // en, zh-tw
     langIndex := regex.SubexpIndex("lang")
 
-    for targetLang, _ := range messageFileMap {
+    for targetLang, _ := range i18nObj.messageFileMap {
         i18nRouter.HandleFunc(fmt.Sprintf("/%s/", targetLang),
             func(writer http.ResponseWriter, request *http.Request) {
                 writer.Header().Set("Content-Type", "application/javascript; charset=utf-8")
@@ -67,7 +85,7 @@ func initI18nJS() {
                     return
                 }
                 curLang := matchSlice[langIndex]
-                messageFile := messageFileMap[curLang]
+                messageFile := i18nObj.messageFileMap[curLang]
                 var messageIDSet []i18nPlugin.MessageID
                 for _, message := range messageFile.Messages {
                     messageIDSet = append(messageIDSet, i18nPlugin.MessageID(message.ID))

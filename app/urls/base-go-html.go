@@ -32,8 +32,10 @@ func init() {
     BaseContext = map[string]interface{}{
         "Site": SiteSetting,
         // "TabIcon": "/static/app.ico", // use `/favicon.ico` to instead of it.
+        "AppName": app.ProgName,
         "Author":  app.Author,
         "Version": app.Version,
+        // Lang: // determine at getting request
     }
 }
 
