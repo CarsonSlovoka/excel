@@ -16,7 +16,7 @@ type LangTmpl struct {
 }
 
 type MessageID = string
-type Context map[string]interface{}
+type context map[string]interface{}
 
 func (i18nTmpl *LangTmpl) mustLegalLang(lang string) {
     _, _, err := language.ParseAcceptLanguage(lang)
@@ -50,7 +50,7 @@ func (i18nTmpl *LangTmpl) GetI18nFuncMap(templateData map[string]interface{}) te
 
         if options != nil {
             switch options.(type) {
-            case Context:
+            case context:
             case interface{}:
                 if reflect.ValueOf(options).Kind() == reflect.Map {
                     for key, val := range options.(map[string]interface{}) {
@@ -68,14 +68,14 @@ func (i18nTmpl *LangTmpl) GetI18nFuncMap(templateData map[string]interface{}) te
     return template.FuncMap{"i18n": i18nFunc, "T": i18nFunc}
 }
 
-func (i18nTmpl *LangTmpl) Render(wr io.Writer, ctx Context) error {
+func (i18nTmpl *LangTmpl) Render(wr io.Writer, ctx context) error {
     if err := i18nTmpl.Template.Execute(wr, ctx); err != nil {
         return err
     }
     return nil
 }
 
-func (i18nTmpl *LangTmpl) MustRender(wr io.Writer, ctx Context) {
+func (i18nTmpl *LangTmpl) MustRender(wr io.Writer, ctx context) {
     if err := i18nTmpl.Render(wr, ctx); err != nil {
         log.Fatal(err)
     }

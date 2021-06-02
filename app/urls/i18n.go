@@ -101,7 +101,7 @@ func initI18nJS() {
                 })
 
                 // io.MultiWriter(writer, os.Stdout)
-                langTmpl.MustRender(writer, i18nPlugin.Context{
+                langTmpl.MustRender(writer, Context{
                     "MessageSet": messageIDSet,
                 })
             }).
