@@ -88,7 +88,11 @@ func initI18nJS() {
                 messageFile := i18nObj.messageFileMap[curLang]
                 var messageIDSet []i18nPlugin.MessageID
                 for _, message := range messageFile.Messages {
-                    messageIDSet = append(messageIDSet, i18nPlugin.MessageID(message.ID))
+                    mID := message.ID
+                    if strings.ContainsAny(mID, ".") {
+                        continue // ignore [parent.sub]
+                    }
+                    messageIDSet = append(messageIDSet, mID)
                 }
 
                 langTmpl.MustCompile(curLang, expr, map[string]interface{}{
