@@ -1,16 +1,15 @@
 package urls
 
 import (
-    "errors"
     "github.com/CarsonSlovoka/excel/app/server"
     "github.com/CarsonSlovoka/excel/pkg/i18n"
     i18nPlugin "github.com/CarsonSlovoka/excel/pkg/i18n"
     httpPlugin "github.com/CarsonSlovoka/excel/pkg/net/http"
+    "github.com/CarsonSlovoka/excel/pkg/tpl/funcs"
     "html/template"
     "io/fs"
     "log"
     "net/http"
-    "reflect"
 )
 
 type htmlTemplate struct {
@@ -47,7 +46,7 @@ func (t *htmlTemplate) ServeHTTP(w http.ResponseWriter, r *http.Request) {
     }
 
     t.MustCompile(lang.(string), "", ctx)
-    if err := t.Render(w, i18nPlugin.Context(ctx)); err != nil {
+    if err := t.Render(w, ctx); err != nil {
         log.Println(err)
         httpPlugin.ShowErrorRequest(w, http.StatusBadRequest, "BadRequest\n")
         return
@@ -62,27 +61,10 @@ func NewTemplate(targetName string, fs fs.FS, patterns ...string) *htmlTemplate 
         i18nFunc := func(messageID string, templateData interface{}) string {
             return messageID
         } // Just let "i18n" and T is legal. Don't worry. The implementation for the function will change when doing Compile.
-        dictFunc := func(values ...interface{}) (map[string]interface{}, error) {
-            if len(values)%2 != 0 {
-                return nil, errors.New("parameters must be even")
-            }
-            dict := make(map[string]interface{})
-            var key, val interface{}
-            for {
-                key, val, values = values[0], values[1], values[2:]
-                switch reflect.ValueOf(key).Kind() {
-                case reflect.String:
-                    dict[key.(string)] = val
-                default:
-                    return nil, errors.New(`type must equal to "string"`)
-                }
-                if len(values) == 0 {
-                    break
-                }
-            }
-            return dict, nil
+
+        return template.FuncMap{"i18n": i18nFunc, "T": i18nFunc,
+            "dict": funcs.Dict,
         }
-        return template.FuncMap{"i18n": i18nFunc, "T": i18nFunc, "dict": dictFunc}
     }
     ht, err := template.New(targetName).Funcs(tmplFuncs()).ParseFS(fs, patterns...)
     if err != nil {

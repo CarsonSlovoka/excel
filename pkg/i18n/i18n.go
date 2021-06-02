@@ -15,7 +15,7 @@ type LangTmpl struct {
     *template.Template
 }
 
-type MessageID string
+type MessageID = string
 type Context map[string]interface{}
 
 func (i18nTmpl *LangTmpl) mustLegalLang(lang string) {
@@ -45,7 +45,7 @@ func (i18nTmpl *LangTmpl) MustCompile(
 }
 
 func (i18nTmpl *LangTmpl) GetI18nFuncMap(templateData map[string]interface{}) template.FuncMap {
-    i18nFunc := func(messageID MessageID, options interface{}) string {
+    i18nFunc := func(messageID interface{}, options interface{}) (string, error) {
         // {{ i18n "whatsInThis" . }}
 
         if options != nil {
@@ -61,9 +61,9 @@ func (i18nTmpl *LangTmpl) GetI18nFuncMap(templateData map[string]interface{}) te
         }
 
         return i18nTmpl.Localizer.MustLocalize(&i18n.LocalizeConfig{
-            MessageID:    string(messageID),
+            MessageID:    messageID.(string),
             TemplateData: templateData, // other = "What's in this {{ .Type }}"
-        })
+        }), nil
     }
     return template.FuncMap{"i18n": i18nFunc, "T": i18nFunc}
 }

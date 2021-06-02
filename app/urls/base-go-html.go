@@ -22,7 +22,7 @@ func init() {
     }
 }
 
-type Context map[string]interface{}
+type Context = map[string]interface{} // alias
 
 var (
     BaseContext Context
