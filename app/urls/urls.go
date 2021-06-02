@@ -1,6 +1,7 @@
 package urls
 
 import (
+    "errors"
     "github.com/CarsonSlovoka/excel/app/server"
     "github.com/CarsonSlovoka/excel/pkg/i18n"
     i18nPlugin "github.com/CarsonSlovoka/excel/pkg/i18n"
@@ -9,6 +10,7 @@ import (
     "io/fs"
     "log"
     "net/http"
+    "reflect"
 )
 
 type htmlTemplate struct {
@@ -24,7 +26,7 @@ func (t *htmlTemplate) ServeHTTP(w http.ResponseWriter, r *http.Request) {
         }
     }
 
-    noLangHandler :=  func() {
+    noLangHandler := func() {
         if err := t.Execute(w, ctx); err != nil {
             log.Println(err)
             httpPlugin.ShowErrorRequest(w, http.StatusBadRequest, err.Error())
@@ -57,8 +59,30 @@ func NewTemplate(targetName string, fs fs.FS, patterns ...string) *htmlTemplate 
         i18nObj = newI18nObj()
     }
     tmplFuncs := func() template.FuncMap {
-        i18nFunc := func(messageID string) string {return messageID} // Just let "i18n" and T is legal. Don't worry. The implementation for the function will change when doing Compile.
-        return template.FuncMap{"i18n": i18nFunc, "T": i18nFunc}
+        i18nFunc := func(messageID string, templateData interface{}) string {
+            return messageID
+        } // Just let "i18n" and T is legal. Don't worry. The implementation for the function will change when doing Compile.
+        dictFunc := func(values ...interface{}) (map[string]interface{}, error) {
+            if len(values)%2 != 0 {
+                return nil, errors.New("parameters must be even")
+            }
+            dict := make(map[string]interface{})
+            var key, val interface{}
+            for {
+                key, val, values = values[0], values[1], values[2:]
+                switch reflect.ValueOf(key).Kind() {
+                case reflect.String:
+                    dict[key.(string)] = val
+                default:
+                    return nil, errors.New(`type must equal to "string"`)
+                }
+                if len(values) == 0 {
+                    break
+                }
+            }
+            return dict, nil
+        }
+        return template.FuncMap{"i18n": i18nFunc, "T": i18nFunc, "dict": dictFunc}
     }
     ht, err := template.New(targetName).Funcs(tmplFuncs()).ParseFS(fs, patterns...)
     if err != nil {

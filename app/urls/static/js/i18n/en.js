@@ -2,5 +2,6 @@
 var i18n = {
   Author: "",
   Version: "",
-  AskDeleteItem: ""
+  AskDeleteItem: "",
+  AskDeleteSelection:"",
 }

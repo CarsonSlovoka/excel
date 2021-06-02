@@ -6,3 +6,9 @@ other="{{.Version}}"
 
 [AskDeleteItem]
 other="Are you sure you want to delete this item?"
+
+[AskDeleteSelection]
+other="Are you sure you want to delete all select items?"
+
+[Label.SelectFile]
+other="Select the {{.Type}} file"

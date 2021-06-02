@@ -148,7 +148,7 @@ class BSTable {
         },
         event: {
           'click': () => {
-            if (!confirm(i18n.AskDeleteItem)) {
+            if (!confirm(i18n.AskDeleteSelection)) {
               return
             }
 

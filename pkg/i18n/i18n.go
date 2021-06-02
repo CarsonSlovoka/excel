@@ -6,6 +6,7 @@ import (
     "html/template"
     "io"
     "log"
+    "reflect"
 )
 
 type LangTmpl struct {
@@ -44,8 +45,21 @@ func (i18nTmpl *LangTmpl) MustCompile(
 }
 
 func (i18nTmpl *LangTmpl) GetI18nFuncMap(templateData map[string]interface{}) template.FuncMap {
-    i18nFunc := func(messageID MessageID) string {
+    i18nFunc := func(messageID MessageID, options interface{}) string {
         // {{ i18n "whatsInThis" . }}
+
+        if options != nil {
+            switch options.(type) {
+            case Context:
+            case interface{}:
+                if reflect.ValueOf(options).Kind() == reflect.Map {
+                    for key, val := range options.(map[string]interface{}) {
+                        templateData[key] = val
+                    }
+                }
+            }
+        }
+
         return i18nTmpl.Localizer.MustLocalize(&i18n.LocalizeConfig{
             MessageID:    string(messageID),
             TemplateData: templateData, // other = "What's in this {{ .Type }}"

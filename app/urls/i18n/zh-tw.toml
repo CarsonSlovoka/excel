@@ -6,3 +6,10 @@ other="{{.Version}}"
 
 [AskDeleteItem]
 other="您確定要刪除此項目嗎？"
+
+[AskDeleteSelection]
+other="您確定要刪除所選項嗎？"
+
+[Label]
+  [Label.SelectFile]
+    other="選擇{{.Type}}檔案"

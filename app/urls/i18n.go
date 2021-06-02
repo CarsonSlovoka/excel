@@ -66,7 +66,7 @@ func init() {
 func initI18nJS() {
     langTmpl := &i18nPlugin.LangTmpl{Bundle: i18nObj.Bundle}
     expr := `var i18n = {
-{{range .MessageSet}} {{.}}: "{{i18n .}}",
+{{range .MessageSet}} {{.}}: "{{i18n . ""}}",
 {{end}}
 }`
 
