@@ -44,8 +44,9 @@ function save2Server() {
 }
 
 class BSTable {
-  constructor(dataArray) {
+  constructor(dataArray, staticDirURL) {
     this.dataArray = dataArray
+    this.staticDirURL = staticDirURL
     const div = document.getElementById('div-csv-data')
     div.querySelectorAll('*').forEach(node => node.remove())
     this.table = undefined
@@ -84,17 +85,32 @@ class BSTable {
       this.dataArray = this.dataArray.map((obj, idx) => (obj[UNIQUE_ID] = idx, obj)) // add serial number
 
       // [refresh bs-table](https://github.com/wenzhixin/bootstrap-table/issues/64)
-      const columns = headers.map(e => ({
-        field: e, title: e, sortable: "true",
-        editable: {
-          type: 'text',
-          title: e,
-          emptytext: "",
-          validate: function (v) {
-            if (!v) return "You can't set the null value on this column"
-          },
+      const initColumn = (headerName) => {
+        let obj = {field: headerName, title: headerName, sortable: "true"}
+        const isPng = headerName.startsWith('IMG')
+        if (isPng) {
+          obj.formatter = (value, row, index, field) => {
+            if (headerName.startsWith('IMG')) {
+              if (value.startsWith('http')) {
+                return `<img src="${value}" style="width:60px;height:60px" loading="lazy"/>`
+              }
+              return `<img src="${this.staticDirURL}${value}" style="width:60px;height:60px" loading="lazy"/>`
+            }
+            return value
+          }
+        } else {
+          obj.editable = {
+            type: 'text',
+            title: headerName,
+            emptytext: "",
+            validate: function (v) {
+              if (!v) return "You can't set the null value on this column"
+            },
+          }
         }
-      }))
+        return obj
+      }
+      const columns = headers.map(headerName => (initColumn(headerName)))
       columns.splice(0, 0,
         {checkbox: true, width: 64, align: 'center'}, // Add a checkbox to select the whole row.
         // {field: UNIQUE_ID, title: "uid", visiable: false, sortable: true} // new column for UNIQUE_ID // It's ok if you aren't gonna show it to the user. Data still save on the datatable, no matter you set the filed or not.
@@ -110,6 +126,7 @@ class BSTable {
           ].join('')
         }
       })
+
       this.initToolbar()
       this.table.bootstrapTable('refreshOptions',
         {
@@ -198,27 +215,103 @@ class BSTable {
   }
 }
 
+function inputFileHandler(staticDirURL) {
+  const inputFile = document.getElementById("uploadFile")
+  const inputValue = inputFile.value
+  if (inputValue === "") {
+    return null
+  }
+
+  const selectedFile = document.getElementById('uploadFile').files[0] // https://developer.mozilla.org/en-US/docs/Web/API/File/Using_files_from_web_applications
+  const promise = new Promise(resolve => {
+    const fileContent = ReadFile(selectedFile)
+    resolve(fileContent)
+  })
+
+  promise.then(fileContent => {
+    fileContent = removeExtraSpace(fileContent)
+    const dataArray = $.csv.toObjects(fileContent) // jquery.csv.min.js
+    const bsTable = new BSTable(dataArray, staticDirURL)
+    return null
+  })
+}
+
+
+async function inputStaticDirHandler() {
+  const inputStaticDir = document.getElementById("inputStaticDir")
+  const inputStaticDirValue = inputStaticDir.value
+  if (inputStaticDirValue === "") {
+    return ""
+  }
+
+  const formData = new FormData()
+  formData.set("inputStaticDir", inputStaticDirValue)
+
+  // https://developer.mozilla.org/en-US/docs/Web/API/WindowOrWorkerGlobalScope/fetch
+  const response = await fetch("/api/os/Stat", {
+    method: "post",
+    body: formData
+  })
+
+  if (!response.ok) {
+    const errMsg = await response.text()
+    throw Error(`${response.statusText} (${response.status}) | ${errMsg} `)
+  }
+
+  return await response.json()
+}
+
+async function AskInitStaticDir(staticInfoObj) {
+
+  const formData = new FormData()
+  formData.set("staticInfoObj", JSON.stringify(staticInfoObj))
+
+  const response = await fetch("/user/static/", {
+    method: "post",
+    body: formData
+  })
+
+  if (!response.ok) {
+    const errMsg = await response.text()
+    throw Error(`${response.statusText} (${response.status}) | ${errMsg} `)
+  }
+  const obj = await response.json()
+  return obj.staticDirURL
+}
+
+async function onCommit() {
+  new Promise((resolve, reject) => {
+    resolve(inputStaticDirHandler())
+  })
+    .then((staticInfoObj) => {
+        return AskInitStaticDir(staticInfoObj)
+      }
+    )
+    .then((staticDirURL) => {
+      return inputFileHandler(staticDirURL)
+    })
+    .catch((error) => {
+        alert(error)
+      }
+    )
+}
+
 (
   () => {
     window.onload = () => {
-      const inputFile = document.getElementById("uploadFile")
-      inputFile.onchange = () => {
-        const inputValue = inputFile.value
-        if (inputValue === "") {
-          return
-        }
-
-        const selectedFile = document.getElementById('uploadFile').files[0] // https://developer.mozilla.org/en-US/docs/Web/API/File/Using_files_from_web_applications
-        const promise = new Promise(resolve => {
-          const fileContent = ReadFile(selectedFile)
-          resolve(fileContent)
-        })
-
-        promise.then(fileContent => {
-          fileContent = removeExtraSpace(fileContent)
-          const dataArray = $.csv.toObjects(fileContent) // jquery.csv.min.js
-          const bsTable = new BSTable(dataArray)
-        })
+      // document.getElementById("uploadFile").onchange = () => {}
+      const commitBtn = document.getElementById("Commit")
+      const aboutBtn = document.getElementById("About")
+      commitBtn.onclick = () => {
+        // https://developer.mozilla.org/en-US/docs/Learn/JavaScript/Asynchronous/Async_await
+        // https://developer.mozilla.org/en-US/docs/Web/API/Fetch_API/Using_Fetch
+        onCommit().then()
+      }
+      aboutBtn.onclick = () => {
+        window.location.href = "/about/"
+      }
+      document.getElementById("ExitApp").onclick = () => {
+        window.location.href = "/shutdown/"
       }
     }
   }

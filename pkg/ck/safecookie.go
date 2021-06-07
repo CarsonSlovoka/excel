@@ -1,6 +1,7 @@
 package ck
 
 import (
+    "errors"
     "github.com/gorilla/securecookie"
     "net/http"
     "time"
@@ -48,12 +49,14 @@ func (sc *SafeCookie) GetSecureCookieValue(r *http.Request, cookieName string) (
     ck, err = r.Cookie(cookieName)
     // cookieValue := make(CookieValueMap)
     if ck != nil {
-        err = sc.cookie.Decode(ck.Name,
+        if err = sc.cookie.Decode(ck.Name,
             ck.Value,
-            &cookieValue)
-        return cookieValue, err
+            &cookieValue); err != nil {
+            return nil, errors.New("secureCookie decode error")
+        }
+        return cookieValue, nil
     }
-    return make(CookieValueMap, 0), err
+    return make(CookieValueMap), err
 }
 
 func (sc *SafeCookie) UpdateSecureCookie(writer http.ResponseWriter, request *http.Request, cookieName string,
@@ -63,7 +66,13 @@ func (sc *SafeCookie) UpdateSecureCookie(writer http.ResponseWriter, request *ht
     /*
        expires= time.Now().AddDate(0, 1, 0)
     */
-    cookieValueMap, _ := sc.GetSecureCookieValue(request, cookieName)
+    cookieValueMap, err := sc.GetSecureCookieValue(request, cookieName)
+
+    if cookieValueMap == nil {
+        // This is a rare occurrence and may be the result of an abnormal termination procedure.
+        ClearCookie(cookieName, writer)
+        return err
+    }
 
     for key, val := range updateMap {
         cookieValueMap[key] = val

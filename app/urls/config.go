@@ -36,7 +36,7 @@ func init() {
             expires := time.Now().AddDate(0, 1, 0)
             if err := server.SafeCookie.UpdateSecureCookie(w, r, server.CookieNameMap.Config, outputData, "", &expires); err != nil {
                 w.WriteHeader(http.StatusBadRequest)
-                _, _ = w.Write([]byte(err.Error()))
+                _, _ = w.Write([]byte(err.Error() + "Please try again!"))
                 return
             }
             beautifulJsonByte, err := json.MarshalIndent(outputData, "", "  ")

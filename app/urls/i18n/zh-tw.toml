@@ -10,6 +10,21 @@ other="您確定要刪除此項目嗎？"
 [AskDeleteSelection]
 other="您確定要刪除所選項嗎？"
 
+[FullPath]
+other="完整路徑"
+
+[About]
+other="關於"
+
+[ExitApp]
+other="關閉程式"
+
+[Commit]
+other="提交"
+
 [Label]
   [Label.SelectFile]
     other="選擇{{.Type}}檔案"
+
+  [Label.InputStaticDir]
+    other="請輸入Static資料夾{{.Options}}"

@@ -21,6 +21,7 @@ func ShowErrorRequest(writer http.ResponseWriter, statusCode int, errMsg interfa
     value := reflect.ValueOf(errMsg)
     switch value.Kind() {
     case reflect.String:
+        writer.Header().Set("Content-Type", "text/html; charset=utf-8")
         _, _ = writer.Write([]byte(value.String()))
     case reflect.Struct:
         fallthrough

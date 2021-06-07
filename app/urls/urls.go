@@ -1,6 +1,7 @@
 package urls
 
 import (
+    "github.com/CarsonSlovoka/excel/app"
     "github.com/CarsonSlovoka/excel/app/server"
     "github.com/CarsonSlovoka/excel/pkg/i18n"
     i18nPlugin "github.com/CarsonSlovoka/excel/pkg/i18n"
@@ -33,8 +34,9 @@ func (t *htmlTemplate) ServeHTTP(w http.ResponseWriter, r *http.Request) {
         }
     }
 
-    queryMap, err := server.SafeCookie.GetSecureCookieValue(r, server.CookieNameMap.Config)
-    if err != nil {
+    queryMap, _ := server.SafeCookie.GetSecureCookieValue(r, server.CookieNameMap.Config)
+    if queryMap == nil {
+        app.LoggerError.Printf("Missing language: %s. Set it on URL: /config/?lang=", app.ErrCode.SecureCookieDecodeError.Error())
         noLangHandler()
         return
     }
@@ -63,7 +65,9 @@ func NewTemplate(targetName string, fs fs.FS, patterns ...string) *htmlTemplate 
         } // Just let "i18n" and T is legal. Don't worry. The implementation for the function will change when doing Compile.
 
         return template.FuncMap{"i18n": i18nFunc, "T": i18nFunc,
-            "dict": funcs.Dict,
+            "dict":  funcs.Dict,
+            "Slice": funcs.Slice, // Let 1st char uppercase since "slice" was defined already.
+            "split": funcs.Split,
         }
     }
     ht, err := template.New(targetName).Funcs(tmplFuncs()).ParseFS(fs, patterns...)

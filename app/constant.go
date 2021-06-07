@@ -9,7 +9,7 @@ const (
 func init() {
     About = &about{
         ProgName,
-        Author,
         Version,
+        Author,
     }
 }

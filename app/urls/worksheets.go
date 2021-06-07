@@ -3,6 +3,7 @@ package urls
 import (
     "fmt"
     "github.com/CarsonSlovoka/excel/app/server"
+    http2 "github.com/CarsonSlovoka/excel/pkg/net/http"
     "net/http"
 )
 
@@ -14,9 +15,7 @@ func worksheetsHandlerFunc(w http.ResponseWriter, req *http.Request) {
 
     maxFormSize := int64(32 << 20) // 32 MB
     if err := req.ParseMultipartForm(maxFormSize); err != nil {
-        w.WriteHeader(http.StatusBadRequest)
-        w.Header().Add("Content-Type", "text/html")
-        _, _ = w.Write([]byte("bad request"))
+        http2.ShowErrorRequest(w, http.StatusBadRequest, err.Error())
         return
     }
 
@@ -29,7 +28,6 @@ func worksheetsHandlerFunc(w http.ResponseWriter, req *http.Request) {
         data := val[0]
         fmt.Println(data)
     }
-
 }
 
 func init() {
