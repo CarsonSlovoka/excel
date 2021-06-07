@@ -7,6 +7,7 @@ import (
     "github.com/gorilla/mux"
     "log"
     "net/http"
+    "time"
 )
 
 var (
@@ -33,9 +34,14 @@ func init() {
 
 func ListenAndServe() error {
     Mux.HandleFunc("/shutdown/", func(w http.ResponseWriter, r *http.Request) {
-        if err := server.Shutdown(context.Background()); err != nil {
-            log.Printf("Can't close server: %v", err)
+        exitHandler := func() {
+            if err := server.Shutdown(context.Background()); err != nil {
+                log.Printf("Can't close server: %v", err)
+            }
         }
+
+        time.AfterFunc(time.Duration(5)*time.Second, exitHandler)
+        _, _ = w.Write([]byte("Close App."))
     })
 
     server = http.Server{Addr: fmt.Sprintf(":%s", "7121"), Handler: Mux}
