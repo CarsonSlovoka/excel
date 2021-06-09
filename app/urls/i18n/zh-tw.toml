@@ -22,6 +22,12 @@ other="關閉程式"
 [Commit]
 other="提交"
 
+[Bye]
+other="Bye~"
+
+[UseAgain]
+other="期待您再次使用！"
+
 [Label]
   [Label.SelectFile]
     other="選擇{{.Type}}檔案"

@@ -22,6 +22,12 @@ other="Close Program"
 [Commit]
 other="Commit"
 
+[Bye]
+other="Bye~"
+
+[UseAgain]
+other="We look forward to your use again!"
+
 [Label.SelectFile]
 other="Select the {{.Type}} file"
 

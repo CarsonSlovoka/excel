@@ -77,3 +77,14 @@ func NewTemplate(targetName string, fs fs.FS, patterns ...string) *htmlTemplate 
     langTmpl := &i18nPlugin.LangTmpl{Bundle: i18nObj.Bundle, Template: ht}
     return &htmlTemplate{langTmpl, nil}
 }
+
+func ParseFiles(targetName string, filepath ...string) *htmlTemplate {
+    if i18nObj == nil { // Because we can't make sure the init of I18n are done. If not it will be nil.
+        i18nObj = newI18nObj()
+    }
+
+    langTmpl := &i18nPlugin.LangTmpl{Bundle: i18nObj.Bundle,
+        Template: template.Must(template.New(targetName).Funcs(funcs.GetUtilsFuncMap()).ParseFiles(filepath...))}
+
+    return &htmlTemplate{langTmpl, nil}
+}

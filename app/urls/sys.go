@@ -2,6 +2,7 @@ package urls
 
 import (
     "context"
+    "embed"
     "encoding/json"
     "github.com/CarsonSlovoka/excel/app"
     "github.com/CarsonSlovoka/excel/app/server"
@@ -23,7 +24,12 @@ func initSystemURL() {
     }).Methods("GET")
 }
 
+//go:embed templates/app/close-app.go.html templates/partial/jumbotron.go.html templates/base.go.html
+var exitAppFS embed.FS
+
 func init() {
+    // tmpl := ParseFiles("close-app.go.html", "templates/app/close-app.go.html", "templates/partial/jumbotron.go.html", "templates/base.go.html")
+    tmpl := NewTemplate("close-app.go.html", exitAppFS, "templates/app/close-app.go.html", "templates/partial/jumbotron.go.html", "templates/base.go.html")
     server.Mux.HandleFunc("/shutdown/", func(w http.ResponseWriter, r *http.Request) {
         exitHandler := func() {
             if err := server.Server.Shutdown(context.Background()); err != nil {
@@ -32,6 +38,8 @@ func init() {
         }
 
         time.AfterFunc(time.Duration(5)*time.Second, exitHandler)
-        _, _ = w.Write([]byte("Close App."))
+        // _, _ = w.Write([]byte("Close App."))
+        tmpl.contextSet = append([]Context{}, BaseContext, getLangContext(r))
+        tmpl.ServeHTTP(w, r)
     })
 }

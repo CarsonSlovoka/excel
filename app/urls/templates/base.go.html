@@ -32,8 +32,14 @@
   {{- end -}}
 </head>
 
-<body>
-  {{- block "site-body" . -}}
-  {{- end -}}
-</body>
+<div class="container py-4">
+  <body>
+    {{- block "site-body" . -}}
+    {{- end -}}
+  </body>
+
+  <footer class="pt-3 mt-4 text-muted border-top">
+    &copy; 2021 {{.Author}}
+  </footer>
+</div>
 </html>

@@ -1,0 +1,22 @@
+{{- /*
+https://getbootstrap.com/docs/5.0/migration/#jumbotron
+https://getbootstrap.com/docs/5.0/utilities/spacing/#notation  ms: margin-left
+*/ -}}
+
+
+<div class="container py-4">
+  <header class="pb-3 mb-4 border-bottom">
+    <a href="/" class="d-flex align-items-center text-dark text-decoration-none">
+      <i title="{{.HeaderTitle}}" class="fas fa-file-excel fa-2x" style="color:rgb(130, 201, 30)"></i>
+      <span class="ms-2 fs-4">{{.HeaderDesc}}</span>
+    </a>
+  </header>
+
+  <div class="p-5 mb-4 {{if .IsDarkMod }} text-white bg-dark {{else}} bg-light {{end}} rounded-3">
+    <div class="container-fluid py-5">
+      <h1 class="display-5 fw-bold">{{.CardTitle}}</h1>
+      <p class="col-md-8 fs-4">{{.CardDescription}}</p>
+      <i class="far fa-laugh fa-5x"></i>
+    </div>
+  </div>
+</div>
