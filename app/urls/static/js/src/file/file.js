@@ -267,7 +267,8 @@ async function inputStaticDirHandler() {
 }
 
 async function AskInitStaticDir(staticInfoObj) {
-
+  if (staticInfoObj === "")
+    return ""
   const formData = new FormData()
   formData.set("staticInfoObj", JSON.stringify(staticInfoObj))
 
@@ -285,20 +286,25 @@ async function AskInitStaticDir(staticInfoObj) {
 }
 
 async function onCommit() {
-  new Promise((resolve, reject) => {
+  const staticDirProcess = new Promise((resolve, reject) => {
     resolve(inputStaticDirHandler())
   })
     .then((staticInfoObj) => {
         return AskInitStaticDir(staticInfoObj)
       }
     )
-    .then((staticDirURL) => {
-      return inputFileHandler(staticDirURL)
-    })
     .catch((error) => {
         alert(error)
       }
     )
+
+  const staticDirURL = await staticDirProcess
+  new Promise(resolve => {
+    resolve(inputFileHandler(staticDirURL))
+  })
+    .catch((error) => {
+      alert(error)
+    })
 }
 
 (
