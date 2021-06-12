@@ -30,7 +30,7 @@ other="期待您再次使用！"
 
 [Label]
   [Label.SelectFile]
-    other="選擇{{.Type}}檔案"
+    other="選擇{{with .Type}}{{.}}{{end}}檔案"
 
   [Label.InputStaticDir]
-    other="請輸入Static資料夾{{.Options}}"
+    other="請輸入Static資料夾{{with .Options}}{{.}}{{end}}"

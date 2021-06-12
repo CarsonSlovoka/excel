@@ -29,7 +29,7 @@ other="Bye~"
 other="We look forward to your use again!"
 
 [Label.SelectFile]
-other="Select the {{.Type}} file"
+other="Select the{{with .Type}}{{.}}{{end}} file"
 
 [Label.InputStaticDir]
-other="Input Static Directory.{{.Options}}:"
+other="Input Static Directory.{{with .Options}}{{.}}{{end}}"

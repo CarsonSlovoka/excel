@@ -230,7 +230,12 @@ function inputFileHandler(staticDirURL) {
 
   promise.then(fileContent => {
     fileContent = removeExtraSpace(fileContent)
-    const dataArray = $.csv.toObjects(fileContent) // jquery.csv.min.js
+    const options = {
+      separator: ",", // "\t",
+      delimiter: '"', // default "
+      headers: true // default true
+    }
+    const dataArray = $.csv.toObjects(fileContent, options) // jquery.csv.min.js
     const bsTable = new BSTable(dataArray, staticDirURL)
     return null
   })

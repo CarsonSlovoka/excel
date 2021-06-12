@@ -59,18 +59,8 @@ func NewTemplate(targetName string, fs fs.FS, patterns ...string) *htmlTemplate 
     if i18nObj == nil { // Because we can't make sure the init of I18n are done. If not it will be nil.
         i18nObj = newI18nObj()
     }
-    tmplFuncs := func() template.FuncMap {
-        i18nFunc := func(messageID string, templateData interface{}) string {
-            return messageID
-        } // Just let "i18n" and T is legal. Don't worry. The implementation for the function will change when doing Compile.
-
-        return template.FuncMap{"i18n": i18nFunc, "T": i18nFunc,
-            "dict":  funcs.Dict,
-            "Slice": funcs.Slice, // Let 1st char uppercase since "slice" was defined already.
-            "split": funcs.Split,
-        }
-    }
-    ht, err := template.New(targetName).Funcs(tmplFuncs()).ParseFS(fs, patterns...)
+    tmplFuncs := funcs.GetUtilsFuncMap() // Adding extra FuncMap, by default LangTmpl, will also add it, but if you don't provide Language, that will render it with a standard HTML template; that is why are we need it.
+    ht, err := template.New(targetName).Funcs(tmplFuncs).ParseFS(fs, patterns...)
     if err != nil {
         log.Fatal(err)
     }

@@ -65,14 +65,15 @@ func init() {
 
 func initI18nJS() {
     langTmpl := &i18nPlugin.LangTmpl{Bundle: i18nObj.Bundle}
+    // {{range .MessageSet}} {{.}}: "{{i18n . ""}}",
     expr := `var i18n = {
-{{range .MessageSet}} {{.}}: "{{i18n . ""}}",
+{{range .MessageSet}} {{ replace . "." "" -1 | safeJS}}: "{{i18n . ""}}",
 {{end}}
 }`
 
     i18nRouter := server.Mux.PathPrefix("/i18n/").Subrouter()
 
-    regex := regexp.MustCompile("/i18n/(?P<lang>[a-z]{2}|[a-z]{2}-[a-z]{2})/") // en, zh-tw
+    regex := regexp.MustCompile(`/i18n/(?P<lang>[a-z]{2}|[a-z]{2}-[a-z]{2})/`) // en, zh-tw
     langIndex := regex.SubexpIndex("lang")
 
     for targetLang, _ := range i18nObj.messageFileMap {
@@ -88,11 +89,7 @@ func initI18nJS() {
                 messageFile := i18nObj.messageFileMap[curLang]
                 var messageIDSet []i18nPlugin.MessageID
                 for _, message := range messageFile.Messages {
-                    mID := message.ID
-                    if strings.ContainsAny(mID, ".") {
-                        continue // ignore [parent.sub]
-                    }
-                    messageIDSet = append(messageIDSet, mID)
+                    messageIDSet = append(messageIDSet, message.ID)
                 }
 
                 langTmpl.MustCompile(curLang, expr, map[string]interface{}{

@@ -1,6 +1,7 @@
 package i18n
 
 import (
+    "github.com/CarsonSlovoka/excel/pkg/tpl/funcs"
     "github.com/nicksnyder/go-i18n/v2/i18n"
     "golang.org/x/text/language"
     "html/template"
@@ -44,6 +45,7 @@ func (i18nTmpl *LangTmpl) MustCompile(
     }
 }
 
+// FuncMap: i18n, and other useful functions
 func (i18nTmpl *LangTmpl) GetI18nFuncMap(templateData map[string]interface{}) template.FuncMap {
     i18nFunc := func(messageID interface{}, options interface{}) (string, error) {
         // {{ i18n "whatsInThis" . }}
@@ -65,7 +67,14 @@ func (i18nTmpl *LangTmpl) GetI18nFuncMap(templateData map[string]interface{}) te
             TemplateData: templateData, // other = "What's in this {{ .Type }}"
         }), nil
     }
-    return template.FuncMap{"i18n": i18nFunc, "T": i18nFunc}
+
+    resultMap := template.FuncMap{} // add other useful functions
+    for k, v := range funcs.GetUtilsFuncMap() {
+        resultMap[k] = v
+    }
+    resultMap["i18n"] = i18nFunc
+    resultMap["T"] = i18nFunc
+    return resultMap
 }
 
 func (i18nTmpl *LangTmpl) Render(wr io.Writer, ctx context) error {

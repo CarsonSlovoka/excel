@@ -64,3 +64,24 @@ func Split(obj interface{}, delimiter string) ([]string, error) {
 
     return strings.Split(objStr, delimiter), nil
 }
+
+func Replace(target, old, new interface{}, n int) (string, error) {
+    // n == -1 => ReplaceALL
+
+    sTarget, err := cast.ToStringE(target)
+    if err != nil {
+        return "", err
+    }
+
+    sOld, err := cast.ToStringE(old)
+    if err != nil {
+        return "", err
+    }
+
+    sNew, err := cast.ToStringE(new)
+    if err != nil {
+        return "", err
+    }
+
+    return strings.Replace(sTarget, sOld, sNew, n), nil
+}
