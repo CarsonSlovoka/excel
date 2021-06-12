@@ -286,22 +286,15 @@ async function AskInitStaticDir(staticInfoObj) {
 }
 
 async function onCommit() {
-  const staticDirProcess = new Promise((resolve, reject) => {
+  new Promise((resolve, reject) => {
     resolve(inputStaticDirHandler())
   })
     .then((staticInfoObj) => {
-        return AskInitStaticDir(staticInfoObj)
-      }
-    )
-    .catch((error) => {
-        alert(error)
-      }
-    )
-
-  const staticDirURL = await staticDirProcess
-  new Promise(resolve => {
-    resolve(inputFileHandler(staticDirURL))
-  })
+      return AskInitStaticDir(staticInfoObj)
+    })
+    .then(staticDirURL => {
+      inputFileHandler(staticDirURL)
+    })
     .catch((error) => {
       alert(error)
     })
