@@ -160,10 +160,14 @@ class BSTable {
     const iframeCtxWindow = this.iframe.contentWindow
     const iframeDoc = iframeCtxWindow.document
 
-    iframeCtxWindow.showPopConfig.onclick = (fieldName) => { // add attribute for the function.
-      const modal = iframeDoc.getElementsByClassName("modal")[0]
-      const modalContent = iframeDoc.getElementById("modal-content")
-      modalContent.querySelectorAll('*').forEach(node => node.remove())
+    iframeCtxWindow.showPopConfig.onclick = (args) => { // add attribute for the function.
+      const [fieldName, titleName] = args.split(",")
+      const modal = iframeDoc.getElementsByClassName("popup-modal")[0]
+
+      iframeDoc.getElementById("popup-modal-title").innerText = titleName
+
+      const modalBody = iframeDoc.getElementsByClassName("popup-modal-body")[0]
+      modalBody.querySelectorAll('*').forEach(node => node.remove())
 
       const divFont = document.createElement("div")
       const divFontSize = document.createElement("div")
@@ -218,7 +222,7 @@ class BSTable {
       if ("Font Size") {
         // divBGColor.onclick = () => {}
         divBGColor.className = "mt-5 row"
-        divBGColor.innerHTML = `<input type="color" class="ms-4 form-control form-control-color" value="#000000" title="Font color">`
+        divBGColor.innerHTML = `<input type="color" class="form-control form-control-color" value="#000000" title="Font color">`
         const inputColor = divBGColor.querySelector("input")
         inputColor.style["max-width"] = "5em"
         inputColor.onchange = (e) => {
@@ -228,11 +232,11 @@ class BSTable {
       }
 
       // combine
-      modalContent.append(divFont, divBGColor)
+      modalBody.append(divFont, divBGColor)
       modal.style.display = "block"
     }
 
-    return `<span>${titleName}<sup> <i class="fas fa-tools" onclick="showPopConfig(this, '${fieldName}')"></i></sup></span>`
+    return `<span>${titleName}<sup> <i class="fas fa-tools" onclick="showPopConfig(this, '${fieldName},${titleName}')"></i></sup></span>`
   }
 
   initIframeEvent() {

@@ -1,5 +1,10 @@
 <style>
-  .modal {
+  .popup-modal h2 {
+    text-align: initial;
+  }
+
+  /* The Modal (background) */
+  .popup-modal {
     display: none; /* Hidden by default */
     position: fixed; /* Stay in place */
     z-index: 1; /* Sit on top */
@@ -9,16 +14,33 @@
     width: 100%; /* Full width */
     height: 100%; /* Full height */
     overflow: auto; /* Enable scroll if needed */
-    background-color: rgb(0, 0, 0); /* Fallback color */
-    background-color: rgba(0, 0, 0, 0.4); /* Black w/ opacity */
+    background-color: rgb(0,0,0); /* Fallback color */
+    background-color: rgba(0,0,0,0.4); /* Black w/ opacity */
   }
 
-  .modal-body {
+  .popup-modal-content {
+    position: relative;
     background-color: #fefefe;
     margin: auto;
     padding: 20px;
     border: 1px solid #888;
     width: 50%;
+    box-shadow: 0 4px 8px 0 rgba(0,0,0,0.2),0 6px 20px 0 rgba(0,0,0,0.19);
+    -webkit-animation-name: animatetop;
+    -webkit-animation-duration: 0.4s;
+    animation-name: animatetop;
+    animation-duration: 0.4s
+  }
+
+  /* Add Animation */
+  @-webkit-keyframes animatetop {
+    from {top:-300px; opacity:0}
+    to {top:0; opacity:1}
+  }
+
+  @keyframes animatetop {
+    from {top:-300px; opacity:0}
+    to {top:0; opacity:1}
   }
 
   /* The Close Button */
@@ -35,13 +57,30 @@
     text-decoration: none;
     cursor: pointer;
   }
+
+  .popup-modal-header {
+    padding: 2px 16px;
+    color: black;
+  }
+
+  .popup-modal-body {padding: 2px 16px;}
+
+  .popup-modal-footer {
+    padding: 2px 16px;
+    color: black;
+  }
 </style>
 
-<section class="modal">
-  <div class="modal-body">
-    <span class="close"><i class="far fa-times-circle"></i></span>
-    <section id="modal-content" class="container"></section>
-  </div>
+<section class="popup-modal">
+  <section class="popup-modal-content">
+    <div class="popup-modal-header">
+      <span class="close"><i class="far fa-times-circle"></i></span>
+      <h2 id="popup-modal-title"></h2>
+    </div>
+    <div class="popup-modal-body ms-4"></div>
+    <div class="popup-modal-footer">
+    </div>
+  </section>
 </section>
 
 <script>
@@ -50,9 +89,9 @@
   }
 
   window.onload = () => {
-    const modalHtmlCollection = document.getElementsByClassName("modal")
+    const modalHtmlCollection = document.getElementsByClassName("popup-modal")
     for (let modal of modalHtmlCollection) {
-      const close = modal.querySelector(`div[class="modal-body"] span[class="close"]`)
+      const close = modal.querySelector(`div[class="popup-modal-header"] span[class="close"]`)
       close.onclick = () => {
         modal.style.display = "none"
       }
@@ -60,7 +99,7 @@
 
     // When the user clicks anywhere outside of the modal, close it
     window.onclick = function (event) {
-      if (event.target.className === "modal") {
+      if (event.target.className === "popup-modal") {
         event.target.style.display = "none"
       }
     }
