@@ -71,6 +71,14 @@ async function loadFonts(aliasName, url) {
   return font
 }
 
+function queryCellStyle(cellStyle, attr, defaultVal) {
+  if (cellStyle === undefined) {
+    return defaultVal === undefined ? undefined : defaultVal
+  }
+  const val = cellStyle.css[attr]
+  return val === undefined ? defaultVal : val
+}
+
 class BSTable {
 
   /**
@@ -135,7 +143,7 @@ class BSTable {
       }
       const oldCellStyle = oldObj["cellStyle"]
       // const newCSSObj =  oldCellStyle === undefined ? {css:{}} : oldCellStyle
-      let newCSSObj = {css:{}}
+      let newCSSObj = {css: {}}
       if (oldCellStyle !== undefined) {
         newCSSObj = oldCellStyle()
       }
@@ -155,6 +163,19 @@ class BSTable {
     this.table.bootstrapTable('refresh')
   }
 
+  getCellStyle(fieldName) {
+    for (let col of this.columns) {
+      if (col.field === undefined || col.field !== fieldName) {
+        continue
+      }
+      const cellStyleFunc = col["cellStyle"]
+      if (cellStyleFunc === undefined) {
+        return undefined
+      }
+      return cellStyleFunc()
+    }
+  }
+
   setConfigColumn(fieldName, titleName) {
 
     const iframeCtxWindow = this.iframe.contentWindow
@@ -170,25 +191,29 @@ class BSTable {
       modalBody.querySelectorAll('*').forEach(node => node.remove())
 
       const divFont = document.createElement("div")
-      const divFontSize = document.createElement("div")
+      const columnStyle = this.getCellStyle(fieldName)
+
       if ("Fonts Settings") {
+
+        let oldFontFamily = queryCellStyle(columnStyle, "font-family", "🗛")
+        let oldFontSize = queryCellStyle(columnStyle, "font-size", 8)
         divFont.className = "row"
         divFont.innerHTML = `
 <select dir="rtl" class="pe-5 col-md-8 form-select" aria-label="select fonts" style="font-size:2em;">
-<option selected>🗛</option>
+<option selected>${oldFontFamily}</option>
 </select>
 
 <select dir="rtl" class="ms-2 pe-5 col-md-3 form-select" aria-label="select font-size">
-<option selected>Size</option>
+<option selected>${oldFontSize}</option>
 </select
 `
         // SIZE
         const selectSize = divFont.querySelector(`select[aria-label="select font-size"]`)
-        const N=64, sizeArray=Array(N)
-        for(let i=0; i<N;) {
-          sizeArray[i++]=i + 8
+        const N = 128, sizeArray = Array(N)
+        for (let i = 0; i < N;) {
+          sizeArray[i++] = i + 8
         }
-        for (const curSize of sizeArray){
+        for (const curSize of sizeArray) {
           const nodeOption = document.createElement("option")
           nodeOption.value = curSize
           nodeOption.innerText = curSize
@@ -220,9 +245,10 @@ class BSTable {
 
       const divBGColor = document.createElement("div")
       if ("Font Size") {
+        const oldFontSize = queryCellStyle(columnStyle, "background-color", "#000000")
         // divBGColor.onclick = () => {}
         divBGColor.className = "mt-5 row"
-        divBGColor.innerHTML = `<input type="color" class="form-control form-control-color" value="#000000" title="Font color">`
+        divBGColor.innerHTML = `<input type="color" class="form-control form-control-color" value="${oldFontSize}" title="Font color">`
         const inputColor = divBGColor.querySelector("input")
         inputColor.style["max-width"] = "5em"
         inputColor.onchange = (e) => {
