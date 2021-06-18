@@ -112,6 +112,8 @@
          data-export-types='["csv", "json", "excel", "doc", "sql", "png"]'>
   </table>
 
+  {{template "popupConfig.go.html" .}}
+
   <script>
     var TABLE = document.querySelector("table") // get the first item
     var TABLE_ID = TABLE.getAttribute("id")

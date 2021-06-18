@@ -10,7 +10,7 @@ const (
     sessionName = "session"
 )
 
-//go:embed templates/base.go.html
+//go:embed templates/base.go.html templates/config/popupConfig.go.html
 //go:embed templates/file/*.go.html
 var fsTemplates embed.FS
 

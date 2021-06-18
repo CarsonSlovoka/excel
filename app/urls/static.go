@@ -9,6 +9,7 @@ import (
     "path/filepath"
 )
 
+// Be careful! Put any file to the static directory will increase the size of the executable.
 //go:embed static
 var staticFS embed.FS
 

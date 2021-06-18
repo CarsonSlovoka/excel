@@ -3,3 +3,8 @@
 
 # For Test
 templates/*
+
+# fonts
+*.ttf
+*.woff
+*.woff2

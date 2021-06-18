@@ -43,16 +43,74 @@ function save2Server() {
   xhr.send(formData)
 }
 
+
+/**
+ * @param {string} url
+ * @param {FileInfo} dirInfo
+ */
+function StaticInfo(url, dirInfo) {
+  this.url = url
+  this.dirInfo = dirInfo
+}
+
+function FileInfo(name, size, modTime, isDir, path) {
+  this.Name = name
+  this.Size = size
+  this.ModTime = modTime
+  this.IsDir = isDir
+  this.Path = path
+}
+
+async function loadFonts(aliasName, url) {
+  /*
+  * https://developer.mozilla.org/en-US/docs/Web/API/FontFace/FontFace
+  * https://stackoverflow.com/questions/11355147/font-face-changing-via-javascript
+  * */
+  const font = new FontFace(aliasName, `url(${url})`)
+  await font.load()
+  return font
+}
+
 class BSTable {
-  constructor(dataArray, staticDirURL) {
-    this.dataArray = dataArray
-    this.staticDirURL = staticDirURL
-    const div = document.getElementById('div-csv-data')
-    div.querySelectorAll('*').forEach(node => node.remove())
-    this.table = undefined
-    this.iframe = this.newIframe()
-    this.initIframeEvent()
-    div.append(this.iframe)
+
+  /**
+   * @param {Array} dataArray
+   * @param {StaticInfo} staticInfo
+   */
+  constructor(dataArray, staticInfo) {
+    return (async () => {
+      this.columns = [] // means: bootstrap-table columns
+      this.dataArray = dataArray
+      this.staticInfo = staticInfo
+      this.fontList = await this.getFonts()
+      const div = document.getElementById('div-csv-data')
+      div.querySelectorAll('*').forEach(node => node.remove())
+      this.table = undefined
+      this.iframe = this.newIframe()
+      this.initIframeEvent()
+      div.append(this.iframe)
+    })()
+  }
+
+  /**
+   * @return {Array}
+   */
+  async getFonts() {
+    if (this.staticInfo.url === "") {
+      return []
+    }
+    const formData = new FormData()
+    formData.set("para", JSON.stringify(this.staticInfo.dirInfo))
+    const response = await fetch("/api/path/filepath/Glob?ext=ttf,woff,woff2", {
+      method: "post",
+      body: formData
+    })
+    if (!response.ok) {
+      const errMsg = await response.text()
+      throw Error(`${response.statusText} (${response.status}) | ${errMsg} `)
+    }
+
+    return await response.json()
   }
 
   newIframe() {
@@ -62,6 +120,119 @@ class BSTable {
     iframe.width = "100%"
     iframe.src = "/bs-table/"
     return iframe
+  }
+
+  /**
+   * @param {string} fieldName
+   * @param {Object} cssObj
+   * @example
+   *  - updateBSTableColumnStyle("Name", {"font-family": myFont, "font-weight": 900, "background-color":"#da1235"})
+   */
+  updateBSTableColumnStyle(fieldName, cssObj) {
+    this.columns = this.columns.map(oldObj => {
+      if (oldObj.field !== fieldName) {
+        return oldObj
+      }
+      const oldCellStyle = oldObj["cellStyle"]
+      // const newCSSObj =  oldCellStyle === undefined ? {css:{}} : oldCellStyle
+      let newCSSObj = {css:{}}
+      if (oldCellStyle !== undefined) {
+        newCSSObj = oldCellStyle()
+      }
+      for (const [attr, value] of Object.entries(cssObj)) {
+        newCSSObj.css[attr] = value
+      }
+      oldObj["cellStyle"] = () => {
+        return newCSSObj // return {css: {}}
+      }
+      return oldObj
+    })
+    this.table.bootstrapTable('refreshOptions',
+      {
+        columns: this.columns,
+      }
+    )
+    this.table.bootstrapTable('refresh')
+  }
+
+  setConfigColumn(fieldName, titleName) {
+
+    const iframeCtxWindow = this.iframe.contentWindow
+    const iframeDoc = iframeCtxWindow.document
+
+    iframeCtxWindow.showPopConfig.onclick = (fieldName) => { // add attribute for the function.
+      const modal = iframeDoc.getElementsByClassName("modal")[0]
+      const modalContent = iframeDoc.getElementById("modal-content")
+      modalContent.querySelectorAll('*').forEach(node => node.remove())
+
+      const divFont = document.createElement("div")
+      const divFontSize = document.createElement("div")
+      if ("Fonts Settings") {
+        divFont.className = "row"
+        divFont.innerHTML = `
+<select dir="rtl" class="pe-5 col-md-8 form-select" aria-label="select fonts" style="font-size:2em;">
+<option selected>🗛</option>
+</select>
+
+<select dir="rtl" class="ms-2 pe-5 col-md-3 form-select" aria-label="select font-size">
+<option selected>Size</option>
+</select
+`
+        // SIZE
+        const selectSize = divFont.querySelector(`select[aria-label="select font-size"]`)
+        const N=64, sizeArray=Array(N)
+        for(let i=0; i<N;) {
+          sizeArray[i++]=i + 8
+        }
+        for (const curSize of sizeArray){
+          const nodeOption = document.createElement("option")
+          nodeOption.value = curSize
+          nodeOption.innerText = curSize
+          selectSize.append(nodeOption)
+        }
+        selectSize.onchange = (e) => {
+          const select = e.target
+          const sizeValue = select.options[select.selectedIndex].value
+          this.updateBSTableColumnStyle(fieldName, {"font-size": `${sizeValue}px`})
+        }
+
+        // FONT FAMILY
+        const selectFonts = divFont.querySelector(`select[aria-label="select fonts"]`)
+        for (const curFont of this.fontList) {
+          const nodeOption = document.createElement("option")
+          nodeOption.value = curFont
+          nodeOption.innerText = curFont
+          selectFonts.append(nodeOption)
+        }
+        selectFonts.onchange = async (e) => {
+          const select = e.target
+          const curFont = select.options[select.selectedIndex].value
+          const fontAlias = curFont.replace(/\..*$/, "")
+          const font = await loadFonts(fontAlias, this.staticInfo.url + `fonts/${curFont}`)
+          iframeDoc.fonts.add(font) // document.fonts.add(font)
+          this.updateBSTableColumnStyle(fieldName, {"font-family": fontAlias})
+        }
+      }
+
+      const divBGColor = document.createElement("div")
+      if ("Font Size") {
+        // divBGColor.onclick = () => {}
+        divBGColor.className = "mt-5 row"
+        divBGColor.innerHTML = `<input type="color" class="ms-4 form-control form-control-color" value="#000000" title="Font color">`
+        const inputColor = divBGColor.querySelector("input")
+        inputColor.style["max-width"] = "5em"
+        inputColor.onchange = (e) => {
+          const inputColorValue = e.target.value
+          this.updateBSTableColumnStyle(fieldName, {"background-color": inputColorValue})
+        }
+      }
+
+      // combine
+      modalContent.append(divFont, divBGColor)
+      modal.style.display = "block"
+    }
+
+    return `<span>${titleName}<sup> <i class="fas fa-tools" onclick="showPopConfig(this, '${fieldName}')"></i></sup></span>`
   }
 
   initIframeEvent() {
@@ -86,19 +257,21 @@ class BSTable {
 
       // [refresh bs-table](https://github.com/wenzhixin/bootstrap-table/issues/64)
       const initColumn = (headerName) => {
-        let obj = {field: headerName, title: headerName, sortable: "true"}
+        let obj = {field: headerName, sortable: "true"}
         const isPng = headerName.startsWith('IMG')
         if (isPng) {
+          obj.title = headerName
           obj.formatter = (value, row, index, field) => {
             if (headerName.startsWith('IMG')) {
               if (value.startsWith('http')) {
                 return `<img src="${value}" style="width:60px;height:60px" loading="lazy"/>`
               }
-              return `<img src="${this.staticDirURL}${value}" style="width:60px;height:60px" loading="lazy"/>`
+              return `<img src="${this.staticInfo.url}${value}" style="width:60px;height:60px" loading="lazy"/>`
             }
             return value
           }
         } else {
+          obj.title = this.setConfigColumn(headerName, headerName)
           obj.editable = {
             type: 'text',
             title: headerName,
@@ -127,6 +300,7 @@ class BSTable {
         }
       })
 
+      this.columns = columns
       this.initToolbar()
       this.table.bootstrapTable('refreshOptions',
         {
@@ -215,7 +389,10 @@ class BSTable {
   }
 }
 
-function inputFileHandler(staticDirURL) {
+/**
+ * @param {StaticInfo} staticInfo The properties.
+ */
+function inputFileHandler(staticInfo) {
   const inputFile = document.getElementById("uploadFile")
   const inputValue = inputFile.value
   if (inputValue === "") {
@@ -236,7 +413,7 @@ function inputFileHandler(staticDirURL) {
       headers: true // default true
     }
     const dataArray = $.csv.toObjects(fileContent, options) // jquery.csv.min.js
-    const bsTable = new BSTable(dataArray, staticDirURL)
+    const bsTable = new BSTable(dataArray, staticInfo)
     return null
   })
 }
@@ -246,7 +423,7 @@ async function inputStaticDirHandler() {
   const inputStaticDir = document.getElementById("inputStaticDir")
   const inputStaticDirValue = inputStaticDir.value
   if (inputStaticDirValue === "") {
-    return ""
+    return new FileInfo()
   }
 
   const formData = new FormData()
@@ -262,15 +439,19 @@ async function inputStaticDirHandler() {
     const errMsg = await response.text()
     throw Error(`${response.statusText} (${response.status}) | ${errMsg} `)
   }
-
-  return await response.json()
+  const obj = await response.json()
+  return new FileInfo(obj.Name, obj.Size, obj.ModTime, obj.IsDir, obj.Path)
 }
 
-async function AskInitStaticDir(staticInfoObj) {
-  if (staticInfoObj === "")
+/**
+ * @param {FileInfo} fileInfo
+ * @return {string} static URL
+ */
+async function AskInitStaticDir(fileInfo) {
+  if (fileInfo.Path === undefined)
     return ""
   const formData = new FormData()
-  formData.set("staticInfoObj", JSON.stringify(staticInfoObj))
+  formData.set("staticInfoObj", JSON.stringify(fileInfo))
 
   const response = await fetch("/user/static/", {
     method: "post",
@@ -286,14 +467,19 @@ async function AskInitStaticDir(staticInfoObj) {
 }
 
 async function onCommit() {
+  let staticInfo = new FileInfo()
   new Promise((resolve, reject) => {
     resolve(inputStaticDirHandler())
   })
     .then((staticInfoObj) => {
+      staticInfo = staticInfoObj
       return AskInitStaticDir(staticInfoObj)
     })
-    .then(staticDirURL => {
-      inputFileHandler(staticDirURL)
+    .then(staticURL => {
+      return new StaticInfo(staticURL, staticInfo)
+    })
+    .then(staticInfo => {
+      inputFileHandler(staticInfo)
     })
     .catch((error) => {
       alert(error)

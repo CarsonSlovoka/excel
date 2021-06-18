@@ -38,8 +38,10 @@
     {{- end -}}
   </body>
 
+  {{- if .Site.ShowFooter -}}
   <footer class="pt-3 mt-4 text-muted border-top">
     &copy; 2021 {{.Author}}
   </footer>
+  {{end}}
 </div>
 </html>
