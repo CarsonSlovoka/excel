@@ -157,12 +157,17 @@ class BSTable {
       }
       return oldObj
     })
+    const hiddenColumns = this.table.bootstrapTable('getHiddenColumns')
     this.table.bootstrapTable('refreshOptions',
       {
         columns: this.columns,
       }
     )
+    hiddenColumns.forEach((e) => {
+      this.table.bootstrapTable('hideColumn', e.field)
+    })
     this.table.bootstrapTable('refresh')
+
   }
 
   getCellStyle(fieldName) {
@@ -526,7 +531,7 @@ async function onCommit() {
       staticInfo = new StaticInfo(staticURL, staticFileInfo)
       return ""
     })
-    .then((msg)=>{
+    .then((msg) => {
       return getLocale()
     })
     .then((lang) => {
