@@ -3,6 +3,7 @@ package urls
 import (
     "encoding/json"
     "github.com/CarsonSlovoka/excel/app/server"
+    http2 "github.com/CarsonSlovoka/excel/pkg/net/http"
     "net/http"
     "strings"
     "time"
@@ -12,7 +13,7 @@ func init() {
     /*
        set lang from URL, for example:
         - /config/?lang=en
-        = /config/?lang=zh-tw
+        - /config/?lang=zh-tw
     */
     server.Mux.HandleFunc("/config/",
         func(w http.ResponseWriter, r *http.Request) {
@@ -41,8 +42,7 @@ func init() {
             }
             beautifulJsonByte, err := json.MarshalIndent(outputData, "", "  ")
             if err != nil {
-                w.WriteHeader(http.StatusBadRequest)
-                _, _ = w.Write([]byte(err.Error()))
+                http2.ShowErrorRequest(w, http.StatusBadRequest, err.Error())
                 return
             }
             _, _ = w.Write(beautifulJsonByte)

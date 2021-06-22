@@ -41,7 +41,7 @@ func init() {
 }
 
 func getLangContext(r *http.Request) Context {
-    ctx := Context{"Lang": "en"} // default
+    ctx := Context{"Lang": "en-us"} // default
 
     for _, cookieName := range []string{server.CookieNameMap.Config} {
         queryMap, err := server.SafeCookie.GetSecureCookieValue(r, cookieName)

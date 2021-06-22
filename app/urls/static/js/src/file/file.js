@@ -84,8 +84,9 @@ class BSTable {
   /**
    * @param {Array} dataArray
    * @param {StaticInfo} staticInfo
+   * @param {string} locale
    */
-  constructor(dataArray, staticInfo) {
+  constructor(dataArray, staticInfo, locale) {
     return (async () => {
       this.columns = [] // means: bootstrap-table columns
       this.dataArray = dataArray
@@ -96,6 +97,7 @@ class BSTable {
       this.table = undefined
       this.iframe = this.newIframe()
       this.initIframeEvent()
+      this.locale = locale
       div.append(this.iframe)
     })()
   }
@@ -344,6 +346,7 @@ class BSTable {
           pageSize: 25,
           paginationUseIntermediate: true,
           paginationPagesBySide: 2,
+          locale: this.locale,
         }
       )
       // table.uniqueId = UNIQUE_ID // Add other attributes for bootstrap-table
@@ -424,8 +427,9 @@ class BSTable {
 
 /**
  * @param {StaticInfo} staticInfo The properties.
+ * @param {string} lang
  */
-function inputFileHandler(staticInfo) {
+function inputFileHandler(staticInfo, lang) {
   const inputFile = document.getElementById("uploadFile")
   const inputValue = inputFile.value
   if (inputValue === "") {
@@ -446,7 +450,7 @@ function inputFileHandler(staticInfo) {
       headers: true // default true
     }
     const dataArray = $.csv.toObjects(fileContent, options) // jquery.csv.min.js
-    const bsTable = new BSTable(dataArray, staticInfo)
+    const bsTable = new BSTable(dataArray, staticInfo, lang)
     return null
   })
 }
@@ -499,20 +503,34 @@ async function AskInitStaticDir(fileInfo) {
   return obj.staticDirURL
 }
 
+async function getLocale() {
+  const response = await fetch("/config/", {method: "get"})
+  if (!response.ok) {
+    return "en-us"
+  }
+  const obj = await response.json()
+  return obj.Lang
+}
+
 async function onCommit() {
-  let staticInfo = new FileInfo()
+  let staticFileInfo = new FileInfo()
+  let staticInfo = new StaticInfo("", staticFileInfo)
   new Promise((resolve, reject) => {
     resolve(inputStaticDirHandler())
   })
     .then((staticInfoObj) => {
-      staticInfo = staticInfoObj
+      staticFileInfo = staticInfoObj
       return AskInitStaticDir(staticInfoObj)
     })
     .then(staticURL => {
-      return new StaticInfo(staticURL, staticInfo)
+      staticInfo = new StaticInfo(staticURL, staticFileInfo)
+      return ""
     })
-    .then(staticInfo => {
-      inputFileHandler(staticInfo)
+    .then((msg)=>{
+      return getLocale()
+    })
+    .then((lang) => {
+      inputFileHandler(staticInfo, lang)
     })
     .catch((error) => {
       alert(error)
