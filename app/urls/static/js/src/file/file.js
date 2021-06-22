@@ -341,6 +341,9 @@ class BSTable {
           uniqueId: UNIQUE_ID, // Using the ``headers[0]`` is not a great idea, so I create a column(__id__) instead of it. // data-unique-id
           clickToSelect: true,
           buttonsClass: BUTTONS_CLASS,
+          pageSize: 25,
+          paginationUseIntermediate: true,
+          paginationPagesBySide: 2,
         }
       )
       // table.uniqueId = UNIQUE_ID // Add other attributes for bootstrap-table
