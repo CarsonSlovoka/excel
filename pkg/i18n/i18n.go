@@ -31,6 +31,9 @@ func (i18nTmpl *LangTmpl) MustCompile(
     expr string,
     templateData map[string]interface{},
 ) {
+    if templateData == nil {
+        panic("templateData is null") // GetI18nFuncMap need not nil value.
+    }
     i18nTmpl.mustLegalLang(lang)
     i18nTmpl.Localizer = i18n.NewLocalizer(i18nTmpl.Bundle, lang)
 

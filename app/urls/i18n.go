@@ -25,7 +25,9 @@ type i18nObject struct {
     messageFileMap map[string]*i18n.MessageFile
 }
 
-var i18nObj *i18nObject
+var (
+    i18nObj *i18nObject
+)
 
 func newI18nObj() *i18nObject {
     bundle := i18n.NewBundle(language.English)

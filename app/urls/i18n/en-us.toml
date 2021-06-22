@@ -33,3 +33,7 @@ other="Select the{{with .Type}}{{.}}{{end}} file"
 
 [Label.InputStaticDir]
 other="Input Static Directory.{{with .Options}}{{.}}{{end}}"
+
+[Err]
+  [Err.InputLangNotExist]
+    other="Input lang doesn't exist: {{.Lang}}"

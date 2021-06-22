@@ -34,3 +34,7 @@ other="期待您再次使用！"
 
   [Label.InputStaticDir]
     other="請輸入Static資料夾{{with .Options}}{{.}}{{end}}"
+
+[Err]
+  [Err.InputLangNotExist]
+    other="輸入的語言不存在: {{.Lang}}"
