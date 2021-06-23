@@ -132,31 +132,42 @@ class BSTable {
     return iframe
   }
 
+  getColumn(fieldName) {
+    for (const col of this.columns) {
+      if (col.field === fieldName) {
+        return col
+      }
+    }
+    return undefined
+  }
+
   /**
    * @param {string} fieldName
    * @param {Object} cssObj
    * @example
    *  - updateBSTableColumnStyle("Name", {"font-family": myFont, "font-weight": 900, "background-color":"#da1235"})
    */
-  updateBSTableColumnStyle(fieldName, cssObj) {
-    this.columns = this.columns.map(oldObj => {
-      if (oldObj.field !== fieldName) {
+  updateBSTableColumnStyle(fieldName, cssObj = {}) {
+    if (Object.keys(cssObj).length > 0) {
+      this.columns = this.columns.map(oldObj => {
+        if (oldObj.field !== fieldName) {
+          return oldObj
+        }
+        const oldCellStyle = oldObj["cellStyle"]
+        // const newCSSObj =  oldCellStyle === undefined ? {css:{}} : oldCellStyle
+        let newCSSObj = {css: {}}
+        if (oldCellStyle !== undefined) {
+          newCSSObj = oldCellStyle()
+        }
+        for (const [attr, value] of Object.entries(cssObj)) {
+          newCSSObj.css[attr] = value
+        }
+        oldObj["cellStyle"] = () => {
+          return newCSSObj // return {css: {}}
+        }
         return oldObj
-      }
-      const oldCellStyle = oldObj["cellStyle"]
-      // const newCSSObj =  oldCellStyle === undefined ? {css:{}} : oldCellStyle
-      let newCSSObj = {css: {}}
-      if (oldCellStyle !== undefined) {
-        newCSSObj = oldCellStyle()
-      }
-      for (const [attr, value] of Object.entries(cssObj)) {
-        newCSSObj.css[attr] = value
-      }
-      oldObj["cellStyle"] = () => {
-        return newCSSObj // return {css: {}}
-      }
-      return oldObj
-    })
+      })
+    }
     const hiddenColumns = this.table.bootstrapTable('getHiddenColumns')
     this.table.bootstrapTable('refreshOptions',
       {
@@ -167,7 +178,6 @@ class BSTable {
       this.table.bootstrapTable('hideColumn', e.field)
     })
     this.table.bootstrapTable('refresh')
-
   }
 
   getCellStyle(fieldName) {
@@ -190,6 +200,7 @@ class BSTable {
 
     iframeCtxWindow.showPopConfig.onclick = (args) => { // add attribute for the function.
       const [fieldName, titleName] = args.split(",")
+      const curColumn = this.getColumn(fieldName)
       const modal = iframeDoc.getElementsByClassName("popup-modal")[0]
 
       iframeDoc.getElementById("popup-modal-title").innerText = titleName
@@ -251,7 +262,7 @@ class BSTable {
       }
 
       const divBGColor = document.createElement("div")
-      if ("Font Size") {
+      if ("Background Color") {
         const oldFontSize = queryCellStyle(columnStyle, "background-color", "#000000")
         // divBGColor.onclick = () => {}
         divBGColor.className = "mt-5 row"
@@ -264,8 +275,24 @@ class BSTable {
         }
       }
 
+      const divSortable = document.createElement("div")
+      if ("Sortable") {
+        divSortable.className = "mt-5 row"
+        divSortable.innerHTML = `
+<label class="ps-0">Sortable</label>
+<label class="switch">
+  <input type="checkbox"><span class="slider round"></span>
+</label>`
+        const checkSortable = divSortable.querySelector(`input[type="checkbox"]`)
+        checkSortable.checked = curColumn.sortable
+        checkSortable.onclick = (e) => {
+          curColumn.sortable = e.target.checked
+          this.updateBSTableColumnStyle(fieldName)
+        }
+      }
+
       // combine
-      modalBody.append(divFont, divBGColor)
+      modalBody.append(divFont, divBGColor, divSortable)
       modal.style.display = "block"
     }
 
@@ -294,7 +321,10 @@ class BSTable {
 
       // [refresh bs-table](https://github.com/wenzhixin/bootstrap-table/issues/64)
       const initColumn = (headerName) => {
-        let obj = {field: headerName, sortable: "true"}
+        let obj = {
+          field: headerName,
+          // sortable: "true"
+        }
         const isPng = headerName.startsWith('IMG')
         if (isPng) {
           obj.title = headerName
