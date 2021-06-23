@@ -4,5 +4,6 @@ var i18n = {
   Version: "",
   AskDeleteItem: "",
   AskDeleteSelection:"",
-  LabelSelectFile:""
+  LabelSelectFile:"",
+  LabelSortable:"",
 }

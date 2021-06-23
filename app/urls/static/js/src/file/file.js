@@ -277,9 +277,10 @@ class BSTable {
 
       const divSortable = document.createElement("div")
       if ("Sortable") {
+        const i18nSortable = i18n.LabelSortable
         divSortable.className = "mt-5 row"
         divSortable.innerHTML = `
-<label class="ps-0">Sortable</label>
+<label class="ps-0">${i18nSortable}</label>
 <label class="switch">
   <input type="checkbox"><span class="slider round"></span>
 </label>`
