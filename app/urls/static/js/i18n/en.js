@@ -6,4 +6,5 @@ var i18n = {
   AskDeleteSelection:"",
   LabelSelectFile:"",
   LabelSortable:"",
+  LabelIsImage:"",
 }

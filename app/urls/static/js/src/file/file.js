@@ -140,34 +140,49 @@ class BSTable {
     }
     return undefined
   }
-
   /**
-   * @param {string} fieldName
+   * @param {Object} targetCol is one of the elements of this.columns
    * @param {Object} cssObj
    * @example
    *  - updateBSTableColumnStyle("Name", {"font-family": myFont, "font-weight": 900, "background-color":"#da1235"})
    */
-  updateBSTableColumnStyle(fieldName, cssObj = {}) {
+  updateBSTableColumnStyle(targetCol, cssObj = {}) {
     if (Object.keys(cssObj).length > 0) {
-      this.columns = this.columns.map(oldObj => {
-        if (oldObj.field !== fieldName) {
-          return oldObj
-        }
-        const oldCellStyle = oldObj["cellStyle"]
-        // const newCSSObj =  oldCellStyle === undefined ? {css:{}} : oldCellStyle
-        let newCSSObj = {css: {}}
-        if (oldCellStyle !== undefined) {
-          newCSSObj = oldCellStyle()
-        }
-        for (const [attr, value] of Object.entries(cssObj)) {
-          newCSSObj.css[attr] = value
-        }
-        oldObj["cellStyle"] = () => {
-          return newCSSObj // return {css: {}}
-        }
-        return oldObj
-      })
+      const oldCellStyle = targetCol["cellStyle"]
+      let newCSSObj = {css: {}}
+      if (oldCellStyle !== undefined) {
+        newCSSObj = oldCellStyle()
+      }
+      for (const [attr, value] of Object.entries(cssObj)) {
+        newCSSObj.css[attr] = value
+      }
+      targetCol["cellStyle"] = () => {
+        return newCSSObj // return {css: {}}
+      }
     }
+
+    if (targetCol.isImg) {
+      targetCol.editable = undefined
+      targetCol.formatter = (value, row, index, field) => {
+        if (value.startsWith('http')) {
+          return `<img src="${value}" alt="\❌" style="width:50%;height:auto;" loading="lazy"/>`
+        }
+        return `<img src="${this.staticInfo.url}${value}" alt="\❌" style="width:50%;height:auto;" loading="lazy"/>`
+      }
+    } else {
+      targetCol.editable = {
+        type: 'text',
+          title: targetCol.field,
+          emptytext: "",
+          validate: function (v) {
+          if (!v) return "You can't set the null value on this column"
+        },
+      }
+      targetCol.formatter = (value, row, index, field) => {
+        return value
+      }
+    }
+
     const hiddenColumns = this.table.bootstrapTable('getHiddenColumns')
     this.table.bootstrapTable('refreshOptions',
       {
@@ -240,7 +255,7 @@ class BSTable {
         selectSize.onchange = (e) => {
           const select = e.target
           const sizeValue = select.options[select.selectedIndex].value
-          this.updateBSTableColumnStyle(fieldName, {"font-size": `${sizeValue}px`})
+          this.updateBSTableColumnStyle(curColumn, {"font-size": `${sizeValue}px`})
         }
 
         // FONT FAMILY
@@ -257,7 +272,7 @@ class BSTable {
           const fontAlias = curFont.replace(/\..*$/, "")
           const font = await loadFonts(fontAlias, this.staticInfo.url + `fonts/${curFont}`)
           iframeDoc.fonts.add(font) // document.fonts.add(font)
-          this.updateBSTableColumnStyle(fieldName, {"font-family": fontAlias})
+          this.updateBSTableColumnStyle(curColumn, {"font-family": fontAlias})
         }
       }
 
@@ -271,29 +286,35 @@ class BSTable {
         inputColor.style["max-width"] = "5em"
         inputColor.onchange = (e) => {
           const inputColorValue = e.target.value
-          this.updateBSTableColumnStyle(fieldName, {"background-color": inputColorValue})
+          this.updateBSTableColumnStyle(curColumn, {"background-color": inputColorValue})
+        }
+      }
+
+
+      const NewToggleBtnEvent = (divNode, btnLabelName, targetAttrName, subFunc = ()=>{}) => {
+        divNode.className = "mt-5 row"
+        divNode.innerHTML = `
+<label class="ps-0">${btnLabelName}</label>
+<label class="switch">
+  <input type="checkbox"><span class="slider round"></span>
+</label>`
+        const checkSortable = divNode.querySelector(`input[type="checkbox"]`)
+        checkSortable.checked = curColumn[targetAttrName] // previous state
+        checkSortable.onclick = (e) => {
+          curColumn[targetAttrName] = e.target.checked
+          subFunc()
+          this.updateBSTableColumnStyle(curColumn)
         }
       }
 
       const divSortable = document.createElement("div")
-      if ("Sortable") {
-        const i18nSortable = i18n.LabelSortable
-        divSortable.className = "mt-5 row"
-        divSortable.innerHTML = `
-<label class="ps-0">${i18nSortable}</label>
-<label class="switch">
-  <input type="checkbox"><span class="slider round"></span>
-</label>`
-        const checkSortable = divSortable.querySelector(`input[type="checkbox"]`)
-        checkSortable.checked = curColumn.sortable
-        checkSortable.onclick = (e) => {
-          curColumn.sortable = e.target.checked
-          this.updateBSTableColumnStyle(fieldName)
-        }
-      }
+      const divIsImg = document.createElement("div")
+      NewToggleBtnEvent(divSortable, i18n.LabelSortable, "sortable")
+      NewToggleBtnEvent(divIsImg, i18n.LabelIsImage, "isImg")
+
 
       // combine
-      modalBody.append(divFont, divBGColor, divSortable)
+      modalBody.append(divFont, divBGColor, divSortable, divIsImg)
       modal.style.display = "block"
     }
 
@@ -322,34 +343,21 @@ class BSTable {
 
       // [refresh bs-table](https://github.com/wenzhixin/bootstrap-table/issues/64)
       const initColumn = (headerName) => {
-        let obj = {
+        return {
           field: headerName,
-          // sortable: "true"
-        }
-        const isPng = headerName.startsWith('IMG')
-        if (isPng) {
-          obj.title = headerName
-          obj.formatter = (value, row, index, field) => {
-            if (headerName.startsWith('IMG')) {
-              if (value.startsWith('http')) {
-                return `<img src="${value}" style="width:60px;height:60px" loading="lazy"/>`
-              }
-              return `<img src="${this.staticInfo.url}${value}" style="width:60px;height:60px" loading="lazy"/>`
-            }
-            return value
-          }
-        } else {
-          obj.title = this.setConfigColumn(headerName, headerName)
-          obj.editable = {
+          // sortable: "true",
+          title: this.setConfigColumn(headerName, headerName),
+          editable: {
             type: 'text',
             title: headerName,
             emptytext: "",
             validate: function (v) {
               if (!v) return "You can't set the null value on this column"
             },
-          }
+          },
+          // 👇 The attribute below is I created not provided by bootstrap-table.
+          isImg: false
         }
-        return obj
       }
       const columns = headers.map(headerName => (initColumn(headerName)))
       columns.splice(0, 0,
