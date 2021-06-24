@@ -140,6 +140,7 @@ class BSTable {
     }
     return undefined
   }
+
   /**
    * @param {Object} targetCol is one of the elements of this.columns
    * @param {Object} cssObj
@@ -161,20 +162,22 @@ class BSTable {
       }
     }
 
-    if (targetCol.isImg) {
+    const imgInfo = targetCol.imgInfo
+    if (imgInfo.isImg) {
+
       targetCol.editable = undefined
       targetCol.formatter = (value, row, index, field) => {
         if (value.startsWith('http')) {
-          return `<img src="${value}" alt="\❌" style="width:50%;height:auto;" loading="lazy"/>`
+          return `<img src="${value}" alt="\❌" style="width:${imgInfo.width};height:${imgInfo.height};" loading="lazy"/>`
         }
-        return `<img src="${this.staticInfo.url}${value}" alt="\❌" style="width:50%;height:auto;" loading="lazy"/>`
+        return `<img src="${this.staticInfo.url}${value}" alt="\❌" style="width:${imgInfo.width};height:${imgInfo.height};" loading="lazy"/>`
       }
     } else {
       targetCol.editable = {
         type: 'text',
-          title: targetCol.field,
-          emptytext: "",
-          validate: function (v) {
+        title: targetCol.field,
+        emptytext: "",
+        validate: function (v) {
           if (!v) return "You can't set the null value on this column"
         },
       }
@@ -291,7 +294,8 @@ class BSTable {
       }
 
 
-      const NewToggleBtnEvent = (divNode, btnLabelName, targetAttrName, subFunc = ()=>{}) => {
+      const NewToggleBtnEvent = (divNode, btnLabelName, target, attrName, subFunc = () => {
+      }) => {
         divNode.className = "mt-5 row"
         divNode.innerHTML = `
 <label class="ps-0">${btnLabelName}</label>
@@ -299,22 +303,57 @@ class BSTable {
   <input type="checkbox"><span class="slider round"></span>
 </label>`
         const checkSortable = divNode.querySelector(`input[type="checkbox"]`)
-        checkSortable.checked = curColumn[targetAttrName] // previous state
+        checkSortable.checked = target[attrName] // previous state
         checkSortable.onclick = (e) => {
-          curColumn[targetAttrName] = e.target.checked
+          target[attrName] = e.target.checked
           subFunc()
           this.updateBSTableColumnStyle(curColumn)
         }
       }
 
+      const NewSliderRangeEvent = (divNode, labelName, target, attrName, subFunc = () => {
+      }) => {
+        const targetValue = target[attrName].replace('%', "")
+        divNode.className = "mt-2"
+        divNode.innerHTML = `
+<label class="ps-0">${labelName}(${targetValue}%)</label>
+<input type="range" min="1" max="300" value="${targetValue}">`
+
+
+        const label = divNode.querySelector(`label`)
+        const rangeInput = divNode.querySelector(`input[type="range"]`)
+        rangeInput.oninput = (e) => {
+          const val = e.target.value
+          label.innerText = `${labelName}(${val}%)`
+          target[attrName] = val
+          subFunc()
+          this.updateBSTableColumnStyle(curColumn)
+        }
+      }
+
+      const fieldsetImg = document.createElement("fieldset")
+      fieldsetImg.className = "mt-2 row"
+      fieldsetImg.innerHTML = `
+<fieldset>
+<legend>${i18n.LabelImage}:</legend>
+</fieldset>
+`
+      fieldsetImg.disabled = !(curColumn.imgInfo["isImg"])
+
+      const divResizeImgWidth = document.createElement("div")
+      fieldsetImg.append(divResizeImgWidth)
+      NewSliderRangeEvent(divResizeImgWidth, i18n.LabelWidth, curColumn.imgInfo, "width")
+
+
       const divSortable = document.createElement("div")
       const divIsImg = document.createElement("div")
-      NewToggleBtnEvent(divSortable, i18n.LabelSortable, "sortable")
-      NewToggleBtnEvent(divIsImg, i18n.LabelIsImage, "isImg")
-
+      NewToggleBtnEvent(divSortable, i18n.LabelSortable, curColumn, "sortable")
+      NewToggleBtnEvent(divIsImg, i18n.LabelIsImage, curColumn.imgInfo, "isImg", () => {
+        fieldsetImg.disabled = !(curColumn.imgInfo["isImg"])
+      })
 
       // combine
-      modalBody.append(divFont, divBGColor, divSortable, divIsImg)
+      modalBody.append(divFont, divBGColor, divSortable, divIsImg, fieldsetImg)
       modal.style.display = "block"
     }
 
@@ -356,7 +395,11 @@ class BSTable {
             },
           },
           // 👇 The attribute below is I created not provided by bootstrap-table.
-          isImg: false
+          imgInfo: {
+            isImg: false,
+            width: "50%",
+            height: "auto",
+          }
         }
       }
       const columns = headers.map(headerName => (initColumn(headerName)))

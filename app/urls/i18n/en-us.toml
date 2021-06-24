@@ -37,8 +37,12 @@ other="Input Static Directory.{{with .Options}}{{.}}{{end}}"
 [Label]
   [Label.Sortable]
     other="Sortable"
+  [Label.Image]
+    other="Image"
   [Label.IsImage]
     other="Is it an image?"
+  [Label.Width]
+    other="Width"
 
 [Err]
   [Err.InputLangNotExist]

@@ -7,4 +7,6 @@ var i18n = {
   LabelSelectFile:"",
   LabelSortable:"",
   LabelIsImage:"",
+  LabelImage:"",
+  LabelWidth:"",
 }
