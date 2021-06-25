@@ -126,7 +126,7 @@ class BSTable {
   newIframe() {
     const iframe = document.createElement('iframe')
     iframe.id = IFRAME_ID
-    iframe.height = "100%"
+    iframe.height = "724px"
     iframe.width = "100%"
     iframe.src = "/bs-table/"
     return iframe
@@ -190,6 +190,7 @@ class BSTable {
     this.table.bootstrapTable('refreshOptions',
       {
         columns: this.columns,
+        // resizable: true,
       }
     )
     hiddenColumns.forEach((e) => {
@@ -281,7 +282,7 @@ class BSTable {
 
       const divBGColor = document.createElement("div")
       if ("Background Color") {
-        const oldFontSize = queryCellStyle(columnStyle, "background-color", "#000000")
+        const oldFontSize = queryCellStyle(columnStyle, "background-color", "#ffffff")
         // divBGColor.onclick = () => {}
         divBGColor.className = "mt-5 row"
         divBGColor.innerHTML = `<input type="color" class="form-control form-control-color" value="${oldFontSize}" title="Font color">`
@@ -311,38 +312,46 @@ class BSTable {
         }
       }
 
-      const NewSliderRangeEvent = (divNode, labelName, target, attrName, subFunc = () => {
+      const NewSliderRangeEvent = (divNode, labelName, min, max, target, attrName, subFunc = () => {
       }) => {
-        const targetValue = target[attrName].replace('%', "")
+        const regex = new RegExp("[^\\d]+$", 'gm') // find unit px, %, em,...
+        const targetValue = target[attrName]
+        const matchArray = String(targetValue).match(regex)
+        const unit = matchArray !== null ? matchArray[0] : ""
         divNode.className = "mt-2"
         divNode.innerHTML = `
-<label class="ps-0">${labelName}(${targetValue}%)</label>
-<input type="range" min="1" max="300" value="${targetValue}">`
+<label class="ps-0">${labelName}(${targetValue})</label>
+<input type="range" min="${min}" max="${max}" value="${String(targetValue).replace(regex, "")}">` // // typeof targetValue === "string" ? targetValue.replace('%', "") : targetValue
 
 
         const label = divNode.querySelector(`label`)
         const rangeInput = divNode.querySelector(`input[type="range"]`)
         rangeInput.oninput = (e) => {
           const val = e.target.value
-          label.innerText = `${labelName}(${val}%)`
+          label.innerText = `${labelName}(${val}${unit})`
           target[attrName] = val
           subFunc()
           this.updateBSTableColumnStyle(curColumn)
         }
       }
 
-      const fieldsetImg = document.createElement("fieldset")
-      fieldsetImg.className = "mt-2 row"
-      fieldsetImg.innerHTML = `
+      const NewFieldSet = (legendName) => {
+        const fieldset = document.createElement("fieldset")
+        fieldset.className = "mt-2 row"
+        fieldset.innerHTML = `
 <fieldset>
-<legend>${i18n.LabelImage}:</legend>
+<legend>${legendName}</legend>
 </fieldset>
 `
+        return fieldset
+      }
+
+      const fieldsetImg = NewFieldSet(i18n.LabelImage)
       fieldsetImg.disabled = !(curColumn.imgInfo["isImg"])
 
       const divResizeImgWidth = document.createElement("div")
       fieldsetImg.append(divResizeImgWidth)
-      NewSliderRangeEvent(divResizeImgWidth, i18n.LabelWidth, curColumn.imgInfo, "width")
+      NewSliderRangeEvent(divResizeImgWidth, i18n.LabelWidth, 1, 300, curColumn.imgInfo, "width")
 
 
       const divSortable = document.createElement("div")
@@ -352,8 +361,14 @@ class BSTable {
         fieldsetImg.disabled = !(curColumn.imgInfo["isImg"])
       })
 
+
+      const fieldsetColumn = NewFieldSet(i18n.LabelColumnAttr)
+      const divColumnWidth = document.createElement("div")
+      fieldsetColumn.append(divColumnWidth)
+      NewSliderRangeEvent(divColumnWidth, i18n.LabelWidth, 5, 20, curColumn, "width")
+
       // combine
-      modalBody.append(divFont, divBGColor, divSortable, divIsImg, fieldsetImg)
+      modalBody.append(divFont, divBGColor, divSortable, divIsImg, fieldsetImg, fieldsetColumn)
       modal.style.display = "block"
     }
 
@@ -385,6 +400,8 @@ class BSTable {
         return {
           field: headerName,
           // sortable: "true",
+          width: 10,
+          widthUnit: "%",
           title: this.setConfigColumn(headerName, headerName),
           editable: {
             type: 'text',
@@ -404,11 +421,11 @@ class BSTable {
       }
       const columns = headers.map(headerName => (initColumn(headerName)))
       columns.splice(0, 0,
-        {checkbox: true, width: 64, align: 'center'}, // Add a checkbox to select the whole row.
+        {checkbox: true, width: 2, widthUnit: "%", align: 'center'}, // Add a checkbox to select the whole row.
         // {field: UNIQUE_ID, title: "uid", visiable: false, sortable: true} // new column for UNIQUE_ID // It's ok if you aren't gonna show it to the user. Data still save on the datatable, no matter you set the filed or not.
       )
       columns.push({
-        field: "tableAction", title: "Action", align: "center", width: 64,
+        field: "tableAction", title: "Action", align: "center", width: 5, widthUnit: "%",
         formatter: (value, row, index, field) => {
           const curID = row[UNIQUE_ID]
           return [
@@ -426,7 +443,7 @@ class BSTable {
           columns: columns, // [{field: "Name", title: "名稱"}, {field: "Desc", title: "說明"}]
           // url: dataURL // You can use ``url`` instead of ``data``, but there is unnecessary since we already get all the data.
           data: this.dataArray,
-          height: 768,
+          height: 628,
           uniqueId: UNIQUE_ID, // Using the ``headers[0]`` is not a great idea, so I create a column(__id__) instead of it. // data-unique-id
           clickToSelect: true,
           buttonsClass: BUTTONS_CLASS,
@@ -600,6 +617,7 @@ async function getLocale() {
 }
 
 async function onCommit() {
+  document.getElementById("input&commit").open = false
   let staticFileInfo = new FileInfo()
   let staticInfo = new StaticInfo("", staticFileInfo)
   new Promise((resolve, reject) => {

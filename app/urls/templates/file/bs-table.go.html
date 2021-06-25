@@ -13,23 +13,31 @@
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-table/1.17.1/bootstrap-table.min.css" integrity="sha512-zfridm8+ad8KSyxzl1REhqDP5975y8Q0AYaF22bcVGOnaVxlekxODmCGu0TP+Kbk3JbiNK5ENTHs7pT+yf+rBA==" crossorigin="anonymous" referrerpolicy="no-referrer" />
   <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-table/1.17.1/bootstrap-table.min.js" integrity="sha512-KtafFo5oE7fpMVyO/gXFnwsAXeGwl8Kxyikp1SCtMc+mXrvzO7WP1Zs70gSNmkcrBd9PS3byB/HFKvAVKtTWdg==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
 
-    <!--bootstrap-table-language-->
+  <!-- extensions: -->
+    <!-- locale -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-table/1.17.1/bootstrap-table-locale-all.min.js" integrity="sha512-y/2Yags0sycip8KsAjHSB7+MSKK175rFyF4xi0+asdxz1VfbQLV0oE2FImw3BaqzpIm45lDoAnQa8Q7gRRM0yQ==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
 
-    <!--bootstrap-table-export-->
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-table/1.17.1/extensions/export/bootstrap-table-export.min.js" integrity="sha512-99lNtbE6F2tY51EwKoGAvsXQ0i8S3NfhMZ+BTTu0+wAVXyv1zhNnd5WB+1x1nvPpDmXWpwXZlpfKyZgd8WLRaA==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+    <!-- Export -->
+      <!--bootstrap-table-export-->
+      <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-table/1.17.1/extensions/export/bootstrap-table-export.min.js" integrity="sha512-99lNtbE6F2tY51EwKoGAvsXQ0i8S3NfhMZ+BTTu0+wAVXyv1zhNnd5WB+1x1nvPpDmXWpwXZlpfKyZgd8WLRaA==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
 
-  <!-- export of PNG (screenshots) -->
-  <script src="https://cdn.jsdelivr.net/npm/es6-promise@4.2.8/dist/es6-promise.auto.min.js" integrity="sha256-Xxrdry6fWSKu1j2ALyuK/gHFQ+2Bp76ZrR6f3QXI47Y=" crossorigin="anonymous"></script>
-  <script src="https://cdn.jsdelivr.net/npm/html2canvas@1.0.0-rc.7/dist/html2canvas.min.js" integrity="sha256-Ax1aqtvxWBY0xWND+tPZVva/VQZy9t1Ce17ZJO+NTRc=" crossorigin="anonymous"></script>
+      <!-- export of PNG (screenshots) -->
+      <script src="https://cdn.jsdelivr.net/npm/es6-promise@4.2.8/dist/es6-promise.auto.min.js" integrity="sha256-Xxrdry6fWSKu1j2ALyuK/gHFQ+2Bp76ZrR6f3QXI47Y=" crossorigin="anonymous"></script>
+      <script src="https://cdn.jsdelivr.net/npm/html2canvas@1.0.0-rc.7/dist/html2canvas.min.js" integrity="sha256-Ax1aqtvxWBY0xWND+tPZVva/VQZy9t1Ce17ZJO+NTRc=" crossorigin="anonymous"></script>
 
-  <!-- If you want to export, then you must import this. -->
-  <script src="https://cdn.jsdelivr.net/npm/tableexport.jquery.plugin@1.10.22/tableExport.min.js" integrity="sha256-Dsris8trQzzQXIM6PgMzSugaNyUacxaR9o2VrJalh6Y=" crossorigin="anonymous"></script>
+      <!-- If you want to export, then you must import this. -->
+      <script src="https://cdn.jsdelivr.net/npm/tableexport.jquery.plugin@1.10.22/tableExport.min.js" integrity="sha256-Dsris8trQzzQXIM6PgMzSugaNyUacxaR9o2VrJalh6Y=" crossorigin="anonymous"></script>
 
-  <!-- extensions: editable -->
-  <link href="//cdnjs.cloudflare.com/ajax/libs/x-editable/1.5.0/bootstrap3-editable/css/bootstrap-editable.css" rel="stylesheet"/>
-  <script src="//cdnjs.cloudflare.com/ajax/libs/x-editable/1.5.0/bootstrap3-editable/js/bootstrap-editable.min.js"></script>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-table/1.17.1/extensions/editable/bootstrap-table-editable.min.js" integrity="sha512-B3suAulTs/tNVnNfCxw1OwToFUG7ODf0dFfOd+M/xok3ZNpeudsT5cqTt+vp3SEJpi3hmAmi9yF06Ne0v8Hl2A==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+    <!-- editable -->
+      <link href="//cdnjs.cloudflare.com/ajax/libs/x-editable/1.5.0/bootstrap3-editable/css/bootstrap-editable.css" rel="stylesheet"/>
+      <script src="//cdnjs.cloudflare.com/ajax/libs/x-editable/1.5.0/bootstrap3-editable/js/bootstrap-editable.min.js"></script>
+      <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-table/1.17.1/extensions/editable/bootstrap-table-editable.min.js" integrity="sha512-B3suAulTs/tNVnNfCxw1OwToFUG7ODf0dFfOd+M/xok3ZNpeudsT5cqTt+vp3SEJpi3hmAmi9yF06Ne0v8Hl2A==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+
+    <!-- resizable
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/jquery-resizable-columns@0.2.3/dist/jquery.resizableColumns.css" integrity="sha256-pnOeaniXq/EnY85GZ3NlDMmFN7eTJfc2MPpfO+UFN4w=" crossorigin="anonymous">
+    <script src="https://cdn.jsdelivr.net/npm/jquery-resizable-columns@0.2.3/dist/jquery.resizableColumns.min.js" integrity="sha256-1pxGs5I5g78tKMDCR19p7mVIZ8kVD0N6qqXeraiheSg=" crossorigin="anonymous"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-table/1.18.3/extensions/resizable/bootstrap-table-resizable.min.js"></script>
+    -->
 
   <style>
     html {
@@ -109,7 +117,8 @@
          data-show-footer="false"
          data-side-pagination="client"
          data-show-button-text-not-use="false"
-         data-export-types='["csv", "json", "excel", "doc", "sql", "png"]'>
+         data-export-types='["csv", "json", "excel", "doc", "sql", "png"]'
+  > <!-- data-resizable="true" -->
   </table>
 
   {{template "popupConfig.go.html" .}}

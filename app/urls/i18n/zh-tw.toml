@@ -46,6 +46,10 @@ other="期待您再次使用！"
 
   [Label.Width]
     other="寬度"
+  [Label.Settings]
+    other="設定"
+  [Label.ColumnAttr]
+    other="欄位屬性"
 
 [Err]
   [Err.InputLangNotExist]

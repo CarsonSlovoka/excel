@@ -9,4 +9,6 @@ var i18n = {
   LabelIsImage:"",
   LabelImage:"",
   LabelWidth:"",
+  LabelSettings:"",
+  LabelColumnAttr:"",
 }

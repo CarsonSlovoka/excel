@@ -43,6 +43,10 @@ other="Input Static Directory.{{with .Options}}{{.}}{{end}}"
     other="Is it an image?"
   [Label.Width]
     other="Width"
+  [Label.Settings]
+    other="Settings"
+  [Label.ColumnAttr]
+    other="Column Attribute"
 
 [Err]
   [Err.InputLangNotExist]
