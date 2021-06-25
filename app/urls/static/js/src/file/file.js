@@ -190,7 +190,6 @@ class BSTable {
     this.table.bootstrapTable('refreshOptions',
       {
         columns: this.columns,
-        // resizable: true,
       }
     )
     hiddenColumns.forEach((e) => {
