@@ -47,6 +47,8 @@ other="Input Static Directory.{{with .Options}}{{.}}{{end}}"
     other="Settings"
   [Label.ColumnAttr]
     other="Column Attribute"
+  [Label.TextAlign]
+    other="Text align"
 
 [Err]
   [Err.InputLangNotExist]

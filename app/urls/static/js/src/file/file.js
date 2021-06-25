@@ -366,6 +366,35 @@ class BSTable {
       fieldsetColumn.append(divColumnWidth)
       NewSliderRangeEvent(divColumnWidth, i18n.LabelWidth, 5, 20, curColumn, "width")
 
+
+      const NewHorizontalRadioButtons = (divNode, labelName, inputArray) => {
+        // https://developer.mozilla.org/en-US/docs/Web/HTML/Element/input/radio#defining_a_radio_group
+        divNode.innerHTML = `<label>${labelName}</label>`
+        const innerDiv = document.createElement("div")
+        for (const value of inputArray) {
+          const label = document.createElement("label")
+          innerDiv.append(label)
+          label.outerHTML = `
+<label class="ps-5">
+  <input name="${labelName}" type="radio" value="${value}">${value}
+</label>`
+          const input = innerDiv.querySelector(`input[value="${value}"]`)
+
+          input.onchange = (e) => {
+            const val = e.target.value
+            curColumn.textAlign = val
+            this.updateBSTableColumnStyle(curColumn, {"text-align": val})
+          }
+        }
+        innerDiv.querySelector(`input[value="${curColumn.textAlign}"]`).checked = true // previous state
+        divNode.append(innerDiv)
+      }
+
+      const divTextAlign = document.createElement("div")
+      divTextAlign.className = "mt-3"
+      NewHorizontalRadioButtons(divTextAlign, i18n.LabelTextAlign, ["start", "center", "end"])
+      fieldsetColumn.append(divTextAlign)
+
       // combine
       modalBody.append(divFont, divBGColor, divSortable, divIsImg, fieldsetImg, fieldsetColumn)
       modal.style.display = "block"
@@ -415,7 +444,8 @@ class BSTable {
             isImg: false,
             width: "50%",
             height: "auto",
-          }
+          },
+          textAlign: "start",
         }
       }
       const columns = headers.map(headerName => (initColumn(headerName)))

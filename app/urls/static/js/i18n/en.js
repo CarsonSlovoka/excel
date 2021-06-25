@@ -11,4 +11,5 @@ var i18n = {
   LabelWidth:"",
   LabelSettings:"",
   LabelColumnAttr:"",
+  LabelTextAlign:"",
 }
