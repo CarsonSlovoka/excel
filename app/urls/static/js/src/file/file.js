@@ -161,8 +161,13 @@ class BSTable {
           }
           const filterObj = {}
           for (const curColSelectString of items) {
-            const { groups: { fieldName, valString } } = /(\[(?<fieldName>.*): (?<valString>.*),?)\]/gm.exec(`${curColSelectString}`)
-            filterObj[fieldName] = valString.split(",").map(e=>e.trim())
+            const {
+              groups: {
+                fieldName,
+                valString
+              }
+            } = /(\[(?<fieldName>.*): (?<valString>.*),?)\]/gm.exec(`${curColSelectString}`)
+            filterObj[fieldName] = valString.split(",").map(e => e.trim())
           }
 
           for (const [fieldName, value] of Object.entries(rowObj)) {
@@ -409,7 +414,7 @@ class BSTable {
       NewSliderRangeEvent(divColumnWidth, i18n.LabelWidth, 5, 20, curColumn, "width")
 
 
-      const NewHorizontalRadioButtons = (divNode, labelName, inputArray) => {
+      const NewHorizontalRadioButtons = (divNode, labelName, target, attrName, inputArray, isCSS = false) => {
         // https://developer.mozilla.org/en-US/docs/Web/HTML/Element/input/radio#defining_a_radio_group
         divNode.innerHTML = `<label>${labelName}</label>`
         const innerDiv = document.createElement("div")
@@ -424,17 +429,21 @@ class BSTable {
 
           input.onchange = (e) => {
             const val = e.target.value
-            curColumn.textAlign = val
-            this.updateBSTableColumnStyle(curColumn, {"text-align": val})
+            target[attrName] = val
+            const cssObj = {}
+            if (isCSS) {
+              cssObj[attrName] = val
+            }
+            this.updateBSTableColumnStyle(curColumn, cssObj)
           }
         }
-        innerDiv.querySelector(`input[value="${curColumn.textAlign}"]`).checked = true // previous state
+        innerDiv.querySelector(`input[value="${target[attrName]}"]`).checked = true // previous state
         divNode.append(innerDiv)
       }
 
       const divTextAlign = document.createElement("div")
       divTextAlign.className = "mt-3"
-      NewHorizontalRadioButtons(divTextAlign, i18n.LabelTextAlign, ["start", "center", "end"])
+      NewHorizontalRadioButtons(divTextAlign, i18n.LabelTextAlign, curColumn, "align", ["left", "center", "right"])
       fieldsetColumn.append(divTextAlign)
 
       // combine
@@ -497,7 +506,7 @@ class BSTable {
         childList: true
       })
 
-      filterGroup.onchange = (event)=>{
+      filterGroup.onchange = (event) => {
         this.updateFilter()
       }
 
@@ -543,13 +552,13 @@ class BSTable {
               if (!v) return "You can't set the null value on this column"
             },
           },
+          align: "left",
           // 👇 The attribute below is I created not provided by bootstrap-table.
           imgInfo: {
             isImg: false,
             width: "50%",
             height: "auto",
           },
-          textAlign: "start",
           isControl: false,
         }
       }
