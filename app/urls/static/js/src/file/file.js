@@ -96,8 +96,14 @@ class BSTable {
       div.querySelectorAll('*').forEach(node => node.remove())
       this.table = undefined
       this.iframe = this.newIframe()
-      this.initIframeEvent()
       this.locale = locale
+      this.options = {
+        filter: {
+          enable: true,
+          isNeedInit: true,
+        }
+      }
+      this.initIframeEvent()
       div.append(this.iframe)
     })()
   }
@@ -126,7 +132,7 @@ class BSTable {
   newIframe() {
     const iframe = document.createElement('iframe')
     iframe.id = IFRAME_ID
-    iframe.height = "724px"
+    iframe.height = "748px"
     iframe.width = "100%"
     iframe.src = "/bs-table/"
     return iframe
@@ -139,6 +145,42 @@ class BSTable {
       }
     }
     return undefined
+  }
+
+  updateFilter() {
+    if (!this.options.filter.enable || this.options.filter.isNeedInit) {
+      throw Error("Filter Need Init or Enable")
+    }
+    this.table.bootstrapTable("filterBy", {
+        "items": this.iframe.contentWindow.multipleSelect.multipleSelect('getSelects', "text"), // https://multiple-select.wenzhixin.net.cn/docs/en/methods#getselects
+      }, {
+        "filterAlgorithm": (rowObj, options = {"items": []}) => {
+          const items = options.items
+          if (items.length === 0) { // select all
+            return true
+          }
+          const filterObj = {}
+          for (const curColSelectString of items) {
+            const { groups: { fieldName, valString } } = /(\[(?<fieldName>.*): (?<valString>.*),?)\]/gm.exec(`${curColSelectString}`)
+            filterObj[fieldName] = valString.split(",").map(e=>e.trim())
+          }
+
+          for (const [fieldName, value] of Object.entries(rowObj)) {
+            if (value === undefined) {
+              continue
+            }
+            const okArray = filterObj[fieldName]
+            if (okArray === undefined) {
+              continue
+            }
+            if (okArray.includes(value)) {
+              return true
+            }
+          }
+          return false
+        }
+      }
+    )
   }
 
   /**
@@ -164,7 +206,6 @@ class BSTable {
 
     const imgInfo = targetCol.imgInfo
     if (imgInfo.isImg) {
-
       targetCol.editable = undefined
       targetCol.formatter = (value, row, index, field) => {
         if (value.startsWith('http')) {
@@ -195,6 +236,9 @@ class BSTable {
     hiddenColumns.forEach((e) => {
       this.table.bootstrapTable('hideColumn', e.field)
     })
+    if (this.options.filter.enable) { // The order is important. Do not put it in front of the "hideColumn"
+      this.updateFilter()
+    }
     this.table.bootstrapTable('refresh')
   }
 
@@ -216,7 +260,7 @@ class BSTable {
     const iframeCtxWindow = this.iframe.contentWindow
     const iframeDoc = iframeCtxWindow.document
 
-    iframeCtxWindow.showPopConfig.onclick = (args) => { // add attribute for the function.
+    iframeCtxWindow.showPopupConfig.onclick = (args) => { // add attribute for the function.
       const [fieldName, titleName] = args.split(",")
       const curColumn = this.getColumn(fieldName)
       const modal = iframeDoc.getElementsByClassName("popup-modal")[0]
@@ -352,14 +396,12 @@ class BSTable {
       fieldsetImg.append(divResizeImgWidth)
       NewSliderRangeEvent(divResizeImgWidth, i18n.LabelWidth, 1, 300, curColumn.imgInfo, "width")
 
-
       const divSortable = document.createElement("div")
       const divIsImg = document.createElement("div")
       NewToggleBtnEvent(divSortable, i18n.LabelSortable, curColumn, "sortable")
       NewToggleBtnEvent(divIsImg, i18n.LabelIsImage, curColumn.imgInfo, "isImg", () => {
         fieldsetImg.disabled = !(curColumn.imgInfo["isImg"])
       })
-
 
       const fieldsetColumn = NewFieldSet(i18n.LabelColumnAttr)
       const divColumnWidth = document.createElement("div")
@@ -396,11 +438,73 @@ class BSTable {
       fieldsetColumn.append(divTextAlign)
 
       // combine
-      modalBody.append(divFont, divBGColor, divSortable, divIsImg, fieldsetImg, fieldsetColumn)
+      modalBody.append(
+        divFont, divBGColor,
+        divSortable, divIsImg,
+        fieldsetImg, fieldsetColumn
+      )
       modal.style.display = "block"
     }
 
-    return `<span>${titleName}<sup> <i class="fas fa-tools" onclick="showPopConfig(this, '${fieldName},${titleName}')"></i></sup></span>`
+    const iframeCtxWinDoc = this.iframe.contentWindow.document
+    const filterID = "selectGroup"
+    const filterGroup = iframeCtxWinDoc.getElementById(filterID)
+    const optgroup = document.createElement("optgroup")
+    optgroup.label = fieldName
+    filterGroup.append(optgroup)
+    const filterOption = this.options.filter
+    if (filterOption.enable && filterOption.isNeedInit) { // must create optgroup first.
+      filterGroup.display = "initial"
+      const observer = new MutationObserver((mutationRecordList, observer) => {
+        for (const mutation of mutationRecordList) {
+          switch (mutation.type) {
+            case "childList":
+              const dataArray = this.table.bootstrapTable('getData', {
+                useCurrentPage: false, // all page
+                includeHiddenRows: true,
+                unfiltered: true, // include all data (unfiltered).
+                // formatted:
+              })
+              for (const curCol of this.columns) {
+                if (curCol.isControl) {
+                  continue
+                }
+                const optgroup = iframeCtxWinDoc.querySelector(`optgroup[label="${curCol.field}"]`)
+                const colDataArray = dataArray.map(row => {
+                  return row[curCol.field]
+                })
+                const colDataSet = new Set(colDataArray)
+                let count = 0
+                for (const item of colDataSet) {
+                  const option = document.createElement("option")
+                  optgroup.append(option)
+                  option.value = item
+                  option.innerText = item
+                  if (++count >= 100) {
+                    console.log(`[filter]: Items too much. ${curCol.field}, length:${colDataSet.size} >= 100`)
+                    break
+                  }
+                }
+                filterGroup.append(optgroup)
+              }
+              this.iframe.contentWindow.initMultipleSelect(filterID)
+              observer.disconnect()
+              return
+          }
+        }
+      })
+      observer.observe(this.iframe.contentWindow.document.getElementById("bs-table"), {
+        childList: true
+      })
+
+      filterGroup.onchange = (event)=>{
+        this.updateFilter()
+      }
+
+      filterOption.isNeedInit = false
+    }
+
+    return `<span>${titleName}<sup> <i class="fas fa-tools" onclick="showPopupConfig(this, '${fieldName},${titleName}')"></i></sup></span>`
   }
 
   initIframeEvent() {
@@ -446,15 +550,20 @@ class BSTable {
             height: "auto",
           },
           textAlign: "start",
+          isControl: false,
         }
       }
       const columns = headers.map(headerName => (initColumn(headerName)))
-      columns.splice(0, 0,
-        {checkbox: true, width: 2, widthUnit: "%", align: 'center'}, // Add a checkbox to select the whole row.
+      columns.splice(0, 0, // Add a checkbox to select the whole row.
+        {
+          checkbox: true, width: 2, widthUnit: "%", align: 'center',
+          isControl: true
+        },
         // {field: UNIQUE_ID, title: "uid", visiable: false, sortable: true} // new column for UNIQUE_ID // It's ok if you aren't gonna show it to the user. Data still save on the datatable, no matter you set the filed or not.
       )
       columns.push({
-        field: "tableAction", title: "Action", align: "center", width: 5, widthUnit: "%",
+        field: "Action", title: "Action", align: "center", width: 5, widthUnit: "%",
+        isControl: true,
         formatter: (value, row, index, field) => {
           const curID = row[UNIQUE_ID]
           return [
@@ -493,8 +602,7 @@ class BSTable {
 
   initToolbar() {
     const divToolbar = this.iframe.contentWindow.document.getElementById("toolbar")
-    divToolbar.setAttribute("style", "padding-left:0.4em")
-    divToolbar.setAttribute("class", "columns columns-right btn-group float-right")
+
     let button
     let icon
 

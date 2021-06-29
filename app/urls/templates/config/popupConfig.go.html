@@ -14,11 +14,11 @@
 </section>
 
 <script>
-  function showPopConfig(e, args) {
-    showPopConfig.onclick(args)
+  function showPopupConfig(e, args) {
+    showPopupConfig.onclick(args)
   }
 
-  window.onload = () => {
+  function initPopupConfig() {
     const modalHtmlCollection = document.getElementsByClassName("popup-modal")
     for (let modal of modalHtmlCollection) {
       const close = modal.querySelector(`div[class="popup-modal-header"] span[class="close"]`)

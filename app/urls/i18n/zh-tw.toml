@@ -52,6 +52,10 @@ other="期待您再次使用！"
     other="欄位屬性"
   [Label.TextAlign]
     other="文字對齊方式"
+  [LabelIsGroup]
+    other="群組?"
+  [Label.FilterByGroup]
+    other="按群組分類"
 
 [Err]
   [Err.InputLangNotExist]

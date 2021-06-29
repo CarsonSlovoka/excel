@@ -33,6 +33,11 @@
       <script src="//cdnjs.cloudflare.com/ajax/libs/x-editable/1.5.0/bootstrap3-editable/js/bootstrap-editable.min.js"></script>
       <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-table/1.17.1/extensions/editable/bootstrap-table-editable.min.js" integrity="sha512-B3suAulTs/tNVnNfCxw1OwToFUG7ODf0dFfOd+M/xok3ZNpeudsT5cqTt+vp3SEJpi3hmAmi9yF06Ne0v8Hl2A==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
 
+
+  <!-- multiple-select -->
+  <link rel="stylesheet" href="https://unpkg.com/multiple-select@1.5.2/dist/multiple-select.min.css">
+  <script src="https://unpkg.com/multiple-select@1.5.2/dist/multiple-select.min.js"></script>
+
   <style>
     html {
       font-family: sans-serif;
@@ -92,7 +97,18 @@
 {{ end }}
 
 {{- define "site-body" -}}
-  <div id="toolbar">
+
+  {{- /* <button onclick="TestFunc(`myID`)">click me</button> */ -}}
+
+  <select class="row ms-2" id="selectGroup" data-placeholder="{{i18n `Label.FilterByGroup` .}}" style="display:none" multiple>
+    {{- /*
+      <optgroup label="my-column">
+        <option value="column-item-x">column-item-x</option>
+      </optgroup>
+    */ -}}
+  </select><br>
+
+  <div class="ms-2 mt-3 btn-group" id="toolbar">
     <!-- <button type="button" class="btn btn-default btn-sm"><i class="far fa-thumbs-up"></i></button> -->
   </div>
 
@@ -121,6 +137,7 @@
     var TABLE = document.querySelector("table") // get the first item
     var TABLE_ID = TABLE.getAttribute("id")
     var table = $(`#${TABLE_ID}`)
+    var multipleSelect = $("#selectGroup")
 
     function DeleteItem(curID) {
       if (!confirm(i18n.AskDeleteItem)) {
@@ -132,6 +149,20 @@
         field: table.uniqueId,
         values: ids,
       })
+    }
+
+    function initMultipleSelect(id) {
+      const multipleSelect = $(`#${id}`).multipleSelect({
+        // https://multiple-select.wenzhixin.net.cn/docs/en/options
+        width: "100%",
+        multiple: true,
+        multipleWidth: 160,
+        dropWidth: "728"
+      })
+    }
+
+    window.onload = () => {
+      initPopupConfig() // Set the action of the close.
     }
   </script>
 {{end}}

@@ -49,6 +49,10 @@ other="Input Static Directory.{{with .Options}}{{.}}{{end}}"
     other="Column Attribute"
   [Label.TextAlign]
     other="Text align"
+  [LabelIsGroup]
+    other="Is it a group?"
+  [Label.FilterByGroup]
+    other="Filter by the group"
 
 [Err]
   [Err.InputLangNotExist]

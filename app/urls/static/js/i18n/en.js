@@ -12,4 +12,6 @@ var i18n = {
   LabelSettings:"",
   LabelColumnAttr:"",
   LabelTextAlign:"",
+  LabelIsGroup:"",
+  FilterByGroup:"",
 }
