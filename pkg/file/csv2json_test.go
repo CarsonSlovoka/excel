@@ -15,17 +15,17 @@ AA, Hello world, 1
 BB, cc, 4.5
 `)
     memoryReader := bytes.NewReader(byteData)
-    jsonObj, err := CSV2Json(memoryReader)
+    dataArray, err := CSV2Json(memoryReader)
     if err != nil {
         panic(err)
     }
-    jsonByte, err := json.Marshal(jsonObj)
+    jsonByte, err := json.Marshal(dataArray)
     if err != nil {
         panic(err)
     }
     assert.Equal(t, `[{"Msg":"Hello world","Name":"AA","number":1},{"Msg":"cc","Name":"BB","number":4.5}]`, string(jsonByte))
 
-    beautifulJsonByte, err := json.MarshalIndent(jsonObj, "", "  ")
+    beautifulJsonByte, err := json.MarshalIndent(dataArray, "", "  ")
     if err != nil {
         panic(err)
     }

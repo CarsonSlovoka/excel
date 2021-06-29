@@ -1,0 +1,6 @@
+{{ template "base.go.html" . }}
+
+{{- define "site-body" -}}
+  {{ $context := dict "HeaderTitle" .AppName  "CardTitle" (i18n "Bye" .) "CardDescription" (i18n "UseAgain" .) "IsDarkMod" true }}
+  {{ template "jumbotron.go.html" $context }}
+{{end}}

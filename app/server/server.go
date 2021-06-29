@@ -1,20 +1,18 @@
 package server
 
 import (
-    "context"
     "fmt"
-    "github.com/CarsonSlovoka/excel/api/session"
+    "github.com/CarsonSlovoka/excel/app"
+    "github.com/CarsonSlovoka/excel/pkg/session"
     "github.com/gorilla/mux"
-    "log"
     "net/http"
 )
 
 var (
     Mux           *mux.Router // http.HandleFunc
-    server        http.Server
+    Server        http.Server
     SessionManger *session.Manager
 )
-
 
 func init() {
     Mux = mux.NewRouter()
@@ -33,13 +31,7 @@ func init() {
 }
 
 func ListenAndServe() error {
-    Mux.HandleFunc("/shutdown/", func(w http.ResponseWriter, r *http.Request) {
-        if err := server.Shutdown(context.Background()); err != nil {
-            log.Printf("Can't close server: %v", err)
-        }
-    })
-
-    server = http.Server{Addr: fmt.Sprintf(":%s", "7121"), Handler: Mux}
-    err := server.ListenAndServe()
+    Server = http.Server{Addr: fmt.Sprintf(":%s", app.Port), Handler: Mux}
+    err := Server.ListenAndServe()
     return err
 }

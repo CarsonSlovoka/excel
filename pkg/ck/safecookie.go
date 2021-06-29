@@ -1,8 +1,10 @@
 package ck
 
 import (
+    "errors"
     "github.com/gorilla/securecookie"
     "net/http"
+    "time"
 )
 
 type SafeCookie struct {
@@ -41,15 +43,50 @@ func (sc *SafeCookie) SetSecureCookie(cookie *http.Cookie, mapValue CookieValueM
     }
 }
 
+// Get previous data if the value is nil will new an empty data.
 func (sc *SafeCookie) GetSecureCookieValue(r *http.Request, cookieName string) (cookieValue CookieValueMap, err error) {
     var ck *http.Cookie
     ck, err = r.Cookie(cookieName)
     // cookieValue := make(CookieValueMap)
     if ck != nil {
-        err = sc.cookie.Decode(ck.Name,
+        if err = sc.cookie.Decode(ck.Name,
             ck.Value,
-            &cookieValue)
-        return cookieValue, err
+            &cookieValue); err != nil {
+            return nil, errors.New("secureCookie decode error")
+        }
+        return cookieValue, nil
     }
-    return
+    return make(CookieValueMap), err
+}
+
+func (sc *SafeCookie) UpdateSecureCookie(writer http.ResponseWriter, request *http.Request, cookieName string,
+    updateMap map[string]interface{},
+    path string, expires *time.Time,
+) error {
+    /*
+       expires= time.Now().AddDate(0, 1, 0)
+    */
+    cookieValueMap, err := sc.GetSecureCookieValue(request, cookieName)
+
+    if cookieValueMap == nil {
+        // This is a rare occurrence and may be the result of an abnormal termination procedure.
+        ClearCookie(cookieName, writer)
+        return err
+    }
+
+    for key, val := range updateMap {
+        cookieValueMap[key] = val
+    }
+
+    cookie := NewCookie(cookieName)
+    if path == "" {
+        cookie.Path = "/"
+    }
+    if expires != nil {
+        cookie.Expires = *expires
+    }
+
+    sc.SetSecureCookie(cookie, cookieValueMap, writer)
+    return nil
+
 }

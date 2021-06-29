@@ -1,0 +1,37 @@
+<link href="/static/css/modal/popupModal.css" rel="stylesheet">
+<link href="/static/css/slider/slider-btn.css" rel="stylesheet">
+
+<section class="popup-modal">
+  <section class="popup-modal-content">
+    <div class="popup-modal-header">
+      <span class="close"><i class="far fa-times-circle"></i></span>
+      <h2 id="popup-modal-title"></h2>
+    </div>
+    <div class="popup-modal-body ms-4"></div>
+    <div class="popup-modal-footer">
+    </div>
+  </section>
+</section>
+
+<script>
+  function showPopupConfig(e, args) {
+    showPopupConfig.onclick(args)
+  }
+
+  function initPopupConfig() {
+    const modalHtmlCollection = document.getElementsByClassName("popup-modal")
+    for (let modal of modalHtmlCollection) {
+      const close = modal.querySelector(`div[class="popup-modal-header"] span[class="close"]`)
+      close.onclick = () => {
+        modal.style.display = "none"
+      }
+    }
+
+    // When the user clicks anywhere outside of the modal, close it
+    window.onclick = function (event) {
+      if (event.target.className === "popup-modal") {
+        event.target.style.display = "none"
+      }
+    }
+  }
+</script>

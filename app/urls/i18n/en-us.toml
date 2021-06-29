@@ -1,0 +1,59 @@
+[Author]
+other="{{.Author}}"
+
+[Version]
+other="{{.Version}}"
+
+[AskDeleteItem]
+other="Are you sure you want to delete this item?"
+
+[AskDeleteSelection]
+other="Are you sure you want to delete all select items?"
+
+[FullPath]
+other="fullpath"
+
+[About]
+other="About"
+
+[ExitApp]
+other="Close Program"
+
+[Commit]
+other="Commit"
+
+[Bye]
+other="Bye~"
+
+[UseAgain]
+other="We look forward to your use again!"
+
+[Label.SelectFile]
+other="Select the{{with .Type}}{{.}}{{end}} file"
+
+[Label.InputStaticDir]
+other="Input Static Directory.{{with .Options}}{{.}}{{end}}"
+
+[Label]
+  [Label.Sortable]
+    other="Sortable"
+  [Label.Image]
+    other="Image"
+  [Label.IsImage]
+    other="Is it an image?"
+  [Label.Width]
+    other="Width"
+  [Label.Settings]
+    other="Settings"
+  [Label.ColumnAttr]
+    other="Column Attribute"
+  [Label.TextAlign]
+    other="Text align"
+  [LabelIsGroup]
+    other="Is it a group?"
+  [Label.FilterByGroup]
+    other="Filter by the group"
+
+[Err]
+  [Err.InputLangNotExist]
+    other="Input lang doesn't exist: {{.Lang}}"
