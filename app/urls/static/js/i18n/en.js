@@ -13,5 +13,8 @@ var i18n = {
   LabelColumnAttr:"",
   LabelTextAlign:"",
   LabelIsGroup:"",
-  FilterByGroup:"",
+  LabelFilterByGroup:"",
+  LabelAddNewColumn:"",
+  AskInputNewColumnName:"",
+  ErrAlreadyExists:"",
 }

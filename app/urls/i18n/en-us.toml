@@ -53,7 +53,15 @@ other="Input Static Directory.{{with .Options}}{{.}}{{end}}"
     other="Is it a group?"
   [Label.FilterByGroup]
     other="Filter by the group"
+  [Label.AddNewColumn]
+    other="Add a new column"
+
+[Ask]
+  [Ask.InputNewColumnName]
+    other="Please input your new column name."
 
 [Err]
+  [Err.AlreadyExists]
+    other="{{with .Value}}{{.}}{{end}}already exists."
   [Err.InputLangNotExist]
     other="Input lang doesn't exist: {{.Lang}}"

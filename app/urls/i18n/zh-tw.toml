@@ -56,7 +56,16 @@ other="期待您再次使用！"
     other="群組?"
   [Label.FilterByGroup]
     other="按群組分類"
+  [Label.AddNewColumn]
+    other="新增一「欄」"
+
+[Ask]
+  [AskInputNewColumnName]
+    other="請輸入您的新欄位名稱"
 
 [Err]
+  [Err.AlreadyExists]
+    other="{{with .Value}}{{.}}{{end}}已存在"
   [Err.InputLangNotExist]
     other="輸入的語言不存在: {{.Lang}}"
+

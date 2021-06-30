@@ -147,6 +147,33 @@ class BSTable {
     return undefined
   }
 
+  // [refresh bs-table](https://github.com/wenzhixin/bootstrap-table/issues/64)
+  initColumn = (headerName) => {
+    return {
+      field: headerName,
+      // sortable: "true",
+      width: 10,
+      widthUnit: "%",
+      title: this.setConfigColumn(headerName, headerName),
+      editable: {
+        type: 'text',
+        title: headerName,
+        emptytext: "",
+        validate: function (v) {
+          if (!v) return "You can't set the null value on this column"
+        },
+      },
+      align: "left",
+      // 👇 The attribute below is I created not provided by bootstrap-table.
+      imgInfo: {
+        isImg: false,
+        width: "50%",
+        height: "auto",
+      },
+      isControl: false,
+    }
+  }
+
   updateFilter() {
     if (!this.options.filter.enable || this.options.filter.isNeedInit) {
       throw Error("Filter Need Init or Enable")
@@ -231,7 +258,10 @@ class BSTable {
         return value
       }
     }
+    this.refreshTAble()
+  }
 
+  refreshTAble() {
     const hiddenColumns = this.table.bootstrapTable('getHiddenColumns')
     this.table.bootstrapTable('refreshOptions',
       {
@@ -536,33 +566,7 @@ class BSTable {
       }
       this.dataArray = this.dataArray.map((obj, idx) => (obj[UNIQUE_ID] = idx, obj)) // add serial number
 
-      // [refresh bs-table](https://github.com/wenzhixin/bootstrap-table/issues/64)
-      const initColumn = (headerName) => {
-        return {
-          field: headerName,
-          // sortable: "true",
-          width: 10,
-          widthUnit: "%",
-          title: this.setConfigColumn(headerName, headerName),
-          editable: {
-            type: 'text',
-            title: headerName,
-            emptytext: "",
-            validate: function (v) {
-              if (!v) return "You can't set the null value on this column"
-            },
-          },
-          align: "left",
-          // 👇 The attribute below is I created not provided by bootstrap-table.
-          imgInfo: {
-            isImg: false,
-            width: "50%",
-            height: "auto",
-          },
-          isControl: false,
-        }
-      }
-      const columns = headers.map(headerName => (initColumn(headerName)))
+      const columns = headers.map(headerName => (this.initColumn(headerName)))
       columns.splice(0, 0, // Add a checkbox to select the whole row.
         {
           checkbox: true, width: 2, widthUnit: "%", align: 'center',
@@ -594,7 +598,7 @@ class BSTable {
           uniqueId: UNIQUE_ID, // Using the ``headers[0]`` is not a great idea, so I create a column(__id__) instead of it. // data-unique-id
           clickToSelect: true,
           buttonsClass: BUTTONS_CLASS,
-          pageSize: 25,
+          pageSize: 10,
           paginationUseIntermediate: true,
           paginationPagesBySide: 2,
           locale: this.locale,
@@ -642,7 +646,7 @@ class BSTable {
           }
         }
       },
-      btnUsersAdd: {
+      btnUpload2Sever: {
         text: 'Save',
         icon: 'fa-save',
         attributes: {
@@ -657,9 +661,44 @@ class BSTable {
           'mouseleave': () => {
           }
         },
-      }
+      },
+      btnAddColumn: {
+        text: "add new column",
+        icon: "fa-plus-square",
+        attributes: {
+          title:i18n.LabelAddNewColumn,
+        },
+        event: {
+          click: (event) => {
+            const headers = Object.keys(this.dataArray[0])
+            const newColName = prompt(
+              i18n.AskInputNewColumnName,
+              `Col-${headers.length - 1}` // +1 -2 (checkbox and, __id__) = -1
+            )
+
+            if (newColName === null) {
+              return
+            }
+
+            const headerSet = new Set(headers)
+            if (headerSet.has(newColName)) {
+              alert(`${newColName} ${i18n.ErrAlreadyExists}`)
+              return
+            }
+
+            this.dataArray.map(rowObj=>{
+              rowObj[newColName] = "-"
+              return rowObj
+            })
+            const newColObj = this.initColumn(newColName)
+            this.columns.splice( headers.length - 1, 0 , newColObj)
+            this.refreshTAble()
+          }
+        }
+      },
     }
 
+    const btnFragment = document.createDocumentFragment()
     for (const [key, btnObj] of Object.entries(buttonsObj)) {
       const iconClass = btnObj.icon
       button = document.createElement("button")
@@ -670,8 +709,9 @@ class BSTable {
       icon = document.createElement("i")
       icon.setAttribute("class", `far ${iconClass}`)
       button.appendChild(icon)
-      divToolbar.appendChild(button)
+      btnFragment.append(button)
     }
+    divToolbar.appendChild(btnFragment)
   }
 }
 
