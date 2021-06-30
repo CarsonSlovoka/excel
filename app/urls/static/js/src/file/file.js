@@ -290,9 +290,6 @@ class BSTable {
 
     const ms = this.iframe.contentWindow.multipleSelect
     if (IsNeedDeleteOldData) {
-      // 強制取代和移除行不通，multipleSelect還會記錄某些條件，再重新init的時候如果沒有移除乾淨，會還是舊有的select
-      // iframeCtxWinDoc.querySelectorAll(`div[class^=ms-parent]`).forEach(node => node.remove())
-      // selectNode.className = selectNode.className.replace("ms-offscreen", "").trim()
       ms.multipleSelect("uncheckAll") // If you have already selected some items, the refresh will not look as expected, so cancel.
       ms.multipleSelect("destroy")
       selectNode.querySelectorAll(`optgroup`).forEach(node => node.remove())
