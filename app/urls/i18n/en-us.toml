@@ -55,13 +55,19 @@ other="Input Static Directory.{{with .Options}}{{.}}{{end}}"
     other="Filter by the group"
   [Label.AddNewColumn]
     other="Add a new column"
+  [Label.DeleteWholeColumn]
+    other="Deleting the whole column"
 
 [Ask]
   [Ask.InputNewColumnName]
     other="Please input your new column name."
+  [Ask.DeleteField]
+    other="Please input the column name which you want to remove."
 
 [Err]
   [Err.AlreadyExists]
     other="{{with .Value}}{{.}}{{end}}already exists."
+  [Err.NotExists]
+    other="{{with .Value}}{{.}}{{end}}not exists."
   [Err.InputLangNotExist]
     other="Input lang doesn't exist: {{.Lang}}"

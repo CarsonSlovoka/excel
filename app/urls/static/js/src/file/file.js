@@ -99,10 +99,12 @@ class BSTable {
       this.locale = locale
       this.options = {
         filter: {
+          id: "selectGroup",
           enable: true,
           isNeedInit: true,
         }
       }
+      this.haveBeenEdit = false
       this.initIframeEvent()
       div.append(this.iframe)
     })()
@@ -258,10 +260,10 @@ class BSTable {
         return value
       }
     }
-    this.refreshTAble()
+    this.refreshTable()
   }
 
-  refreshTAble() {
+  refreshTable() {
     const hiddenColumns = this.table.bootstrapTable('getHiddenColumns')
     this.table.bootstrapTable('refreshOptions',
       {
@@ -275,6 +277,63 @@ class BSTable {
       this.updateFilter()
     }
     this.table.bootstrapTable('refresh')
+  }
+
+  refreshFilterBar(IsNeedDeleteOldData = true) {
+    const filter = this.options.filter
+    if (!filter.enable) {
+      return
+    }
+    const filterID = filter.id
+    const iframeCtxWinDoc = this.iframe.contentDocument
+    const selectNode = iframeCtxWinDoc.getElementById(filterID)
+
+    const ms = this.iframe.contentWindow.multipleSelect
+    if (IsNeedDeleteOldData) {
+      // 強制取代和移除行不通，multipleSelect還會記錄某些條件，再重新init的時候如果沒有移除乾淨，會還是舊有的select
+      // iframeCtxWinDoc.querySelectorAll(`div[class^=ms-parent]`).forEach(node => node.remove())
+      // selectNode.className = selectNode.className.replace("ms-offscreen", "").trim()
+      ms.multipleSelect("uncheckAll") // If you have already selected some items, the refresh will not look as expected, so cancel.
+      ms.multipleSelect("destroy")
+      selectNode.querySelectorAll(`optgroup`).forEach(node => node.remove())
+    }
+
+    const optgroupFragment = document.createDocumentFragment()
+
+    const dataArray = this.table.bootstrapTable('getData', {
+      useCurrentPage: false, // all page
+      includeHiddenRows: true,
+      unfiltered: true, // include all data (unfiltered).
+      // formatted:
+    })
+
+    for (const curCol of this.columns) {
+      if (curCol.isControl) {
+        continue
+      }
+      // const optgroup = optgroupFragment.querySelector(`optgroup[label="${curCol.field}"]`)
+      const optgroup = document.createElement("optgroup")
+      optgroupFragment.append(optgroup)
+      optgroup.label = curCol.field
+
+      const colDataArray = dataArray.map(row => {
+        return row[curCol.field]
+      })
+      const colDataSet = new Set(colDataArray)
+      let count = 0
+      for (const item of colDataSet) {
+        const option = document.createElement("option")
+        optgroup.append(option)
+        option.value = item
+        option.innerText = item
+        if (++count >= 100) {
+          console.log(`[filter]: Items too much. ${curCol.field}, length:${colDataSet.size} >= 100`)
+          break
+        }
+      }
+    }
+    selectNode.append(optgroupFragment)
+    this.iframe.contentWindow.initMultipleSelect(filterID)
   }
 
   getCellStyle(fieldName) {
@@ -486,47 +545,16 @@ class BSTable {
     }
 
     const iframeCtxWinDoc = this.iframe.contentWindow.document
-    const filterID = "selectGroup"
-    const filterGroup = iframeCtxWinDoc.getElementById(filterID)
-    const optgroup = document.createElement("optgroup")
-    optgroup.label = fieldName
-    filterGroup.append(optgroup)
+    const filterID = this.options.filter.id
+    const filterNode = iframeCtxWinDoc.getElementById(filterID)
     const filterOption = this.options.filter
     if (filterOption.enable && filterOption.isNeedInit) { // must create optgroup first.
-      filterGroup.display = "initial"
+      filterNode.display = "initial"
       const observer = new MutationObserver((mutationRecordList, observer) => {
         for (const mutation of mutationRecordList) {
           switch (mutation.type) {
             case "childList":
-              const dataArray = this.table.bootstrapTable('getData', {
-                useCurrentPage: false, // all page
-                includeHiddenRows: true,
-                unfiltered: true, // include all data (unfiltered).
-                // formatted:
-              })
-              for (const curCol of this.columns) {
-                if (curCol.isControl) {
-                  continue
-                }
-                const optgroup = iframeCtxWinDoc.querySelector(`optgroup[label="${curCol.field}"]`)
-                const colDataArray = dataArray.map(row => {
-                  return row[curCol.field]
-                })
-                const colDataSet = new Set(colDataArray)
-                let count = 0
-                for (const item of colDataSet) {
-                  const option = document.createElement("option")
-                  optgroup.append(option)
-                  option.value = item
-                  option.innerText = item
-                  if (++count >= 100) {
-                    console.log(`[filter]: Items too much. ${curCol.field}, length:${colDataSet.size} >= 100`)
-                    break
-                  }
-                }
-                filterGroup.append(optgroup)
-              }
-              this.iframe.contentWindow.initMultipleSelect(filterID)
+              this.refreshFilterBar(false)
               observer.disconnect()
               return
           }
@@ -536,7 +564,7 @@ class BSTable {
         childList: true
       })
 
-      filterGroup.onchange = (event) => {
+      filterNode.onchange = (event) => {
         this.updateFilter()
       }
 
@@ -559,11 +587,8 @@ class BSTable {
       if (this.dataArray.length === 0) {
         return
       }
-      const headers = []
-      const firstObj = this.dataArray[0]
-      for (const [key, value] of Object.entries(firstObj)) {
-        headers.push(key)
-      }
+      const headers = Object.keys(this.dataArray[0])
+
       this.dataArray = this.dataArray.map((obj, idx) => (obj[UNIQUE_ID] = idx, obj)) // add serial number
 
       const columns = headers.map(headerName => (this.initColumn(headerName)))
@@ -605,10 +630,21 @@ class BSTable {
         }
       )
       // table.uniqueId = UNIQUE_ID // Add other attributes for bootstrap-table
-      this.table.bootstrapTable('refresh')
+      this.table.bootstrapTable('refresh') // will call 'refresh.bs.table'
       this.table.highlight($(".search.bs.table").val()) // jquery.highlight-5.min.js
       this.table.on('search.bs.table', (e, text) => {
         this.table.highlight(text)
+      })
+
+      this.table.on('editable-save.bs.table', (e, field, row, rowIndex, oldValue, el) => {
+        this.haveBeenEdit = true
+      })  // https://bootstrap-table.com/docs/extensions/editable/#oneditablesaveeditable-savebstable
+
+      this.table.on('refresh.bs.table', (e, params) => { // https://bootstrap-table.com/docs/api/events/#onrefresh
+        if (this.haveBeenEdit) {
+          this.refreshFilterBar()
+          this.haveBeenEdit = false
+        }
       })
     }
   }
@@ -663,10 +699,10 @@ class BSTable {
         },
       },
       btnAddColumn: {
-        text: "add new column",
+        text: i18n.LabelAddNewColumn,
         icon: "fa-plus-square",
         attributes: {
-          title:i18n.LabelAddNewColumn,
+          title: i18n.LabelAddNewColumn,
         },
         event: {
           click: (event) => {
@@ -686,16 +722,50 @@ class BSTable {
               return
             }
 
-            this.dataArray.map(rowObj=>{
+            this.dataArray.map(rowObj => {
               rowObj[newColName] = "-"
               return rowObj
             })
             const newColObj = this.initColumn(newColName)
-            this.columns.splice( headers.length - 1, 0 , newColObj)
-            this.refreshTAble()
+            this.columns.splice(headers.length - 1, 0, newColObj)
+            this.refreshTable()
+            this.refreshFilterBar() // we will use ``bootstrapTable('getData', {})`` since if you want to refreshFilterBar then call the refreshTable first.
           }
         }
       },
+      btnDeleteColumn: {
+        text: i18n.LabelDeleteWholeColumn,
+        icon: "fa-minus-square",
+        attributes: {
+          title: i18n.LabelDeleteWholeColumn,
+        },
+        event: {
+          click: (event) => {
+            const headers = Object.keys(this.dataArray[0])
+            const targetFieldName = prompt(i18n.AskDeleteField, "")
+
+            if (targetFieldName === null) {
+              return
+            }
+
+            const headerSet = new Set(headers)
+            if (!headerSet.has(targetFieldName)) {
+              alert(`${targetFieldName} ${i18n.ErrNotExists}`)
+              return
+            }
+
+            this.dataArray.map(rowObj => {
+              delete rowObj[targetFieldName]
+              return rowObj
+            })
+            this.columns = this.columns.filter((curObj, index, arr) => {
+              return curObj.field !== targetFieldName
+            })
+            this.refreshTable()
+            this.refreshFilterBar()
+          }
+        }
+      }
     }
 
     const btnFragment = document.createDocumentFragment()

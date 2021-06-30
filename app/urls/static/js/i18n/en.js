@@ -15,6 +15,9 @@ var i18n = {
   LabelIsGroup:"",
   LabelFilterByGroup:"",
   LabelAddNewColumn:"",
+  LabelDeleteWholeColumn:"",
   AskInputNewColumnName:"",
+  AskDeleteField:"",
   ErrAlreadyExists:"",
+  ErrNotExists:"",
 }
