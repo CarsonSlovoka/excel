@@ -1,6 +1,8 @@
 {{ template "base.go.html" . }}
 
 {{- define "site-body" -}}
-  {{ $context := dict "HeaderTitle" .AppName  "CardTitle" (i18n "Bye" .) "CardDescription" (i18n "UseAgain" .) "IsDarkMod" true }}
+  {{- $header := dict "title" .AppName "faIcon" "fas fa-file-excel fa-2x" "style" "color:rgb(130,201,30)" -}}
+  {{- $card := dict "title" (i18n "Bye" .) "description" (i18n "UseAgain" .) -}}
+  {{- $context := dict "Header" $header  "Card" $card "IsDarkMod" true -}}
   {{ template "jumbotron.go.html" $context }}
 {{end}}

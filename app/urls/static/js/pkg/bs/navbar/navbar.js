@@ -5,7 +5,7 @@
 export function Item(text, options = {}) {
   this.text = text
 
-  // 👇 default value
+  // 👇 options
   this.icon = options.icon ?? "" // fas a-times-circle fa-2x
   this.url = options.url ?? ""
   this.className = options.className ?? "" // active, disable
