@@ -23,16 +23,29 @@
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.1/dist/js/bootstrap.bundle.min.js" integrity="sha384-gtEjrD/SeCtmISkJkNUaaKMoLD0//ElJ19smozuHV6z3Iehds+3Ulb9Bn9Plx0x4" crossorigin="anonymous"></script>
   {{- end -}}
 
+  {{- if .Site.EnableTachyons -}}
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/tachyons/4.11.1/tachyons.min.css" integrity="sha512-d0v474klOFSF7qD9WDvyRxAvXaWSxCHDZdnBSZQjo8BpVr6vpjwAgqetpqkKP38DzlOzdVPaLVnzzW1Ba8wB9w==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+  {{- end -}}
+
   {{- if .Site.EnableFontawesome -}}
     <link rel="stylesheet" type="text/css" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.2/css/all.min.css" integrity="sha512-HK5fgLBL+xu6dm/Ii3z4xhlSUyZgTT9tuc/hSrtw6uzJOvgRr2a9jyxxT1ely+B+xFAmJKVSTbpM/CuL7qxO8w==" crossorigin="anonymous" />
     <script defer src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.2/js/all.min.js" integrity="sha512-UwcC/iaz5ziHX7V6LjSKaXgCuRRqbTp1QHpbOJ4l1nw2/boCfZ2KlFIqBUA/uRVF0onbREnY9do8rM/uT/ilqw==" crossorigin="anonymous"></script>
   {{ end }}
+
+  {{- if .Site.ShowNavbar -}}
+    <script type="module" src="/static/js/pkg/bs/navbar/navbar.js"></script>
+    <script defer type="module" src="/static/js/src/navbar.js"></script>
+  {{ end }}
+
 
   {{- block "site-header" . -}}
   {{- end -}}
 </head>
 
 <div class="container py-4">
+  <header>
+    {{if .Site.ShowNavbar}}<nav></nav>{{end}}
+  </header>
   <body>
     {{- block "site-body" . -}}
     {{- end -}}

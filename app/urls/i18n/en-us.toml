@@ -16,9 +16,6 @@ other="fullpath"
 [About]
 other="About"
 
-[ExitApp]
-other="Close Program"
-
 [Commit]
 other="Commit"
 
@@ -57,6 +54,17 @@ other="Input Static Directory.{{with .Options}}{{.}}{{end}}"
     other="Add a new column"
   [Label.DeleteWholeColumn]
     other="Deleting the whole column"
+  [Label.CloseApp]
+    other="Exit"
+  [Label.Lang]
+    other="Language"
+
+
+[Lang]
+  [Lang.EN_US]
+    other="English"
+  [Lang.ZH_TW]
+    other="繁體中文"
 
 [Ask]
   [Ask.InputNewColumnName]

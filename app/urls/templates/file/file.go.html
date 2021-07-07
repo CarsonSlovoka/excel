@@ -8,6 +8,7 @@
   {{- end -}}
 
   <script defer type="module" src="/static/js/pkg/encoding/jquery.csv.min.js"></script>
+  <script defer type="module" src="/static/js/pkg/bs/navbar/navbar.js"></script>
   <script defer type="module" src="/static/js/src/file/file.js"></script>
 {{ end }}
 
@@ -15,16 +16,6 @@
 <article class="mt-3">
 
   <details id="input&commit" open><summary>{{i18n "Label.Settings" .}}</summary>
-    <section title="buttons" class="row justify-content-center">
-      {{- $myButtons := (Slice "Commit,fa-play-circle" "About,fa-info-circle" "ExitApp,btn btn-danger fa-times-circle" ) -}}
-      {{- range $idx, $btnInfoStr := $myButtons -}}
-        {{- $btnInfo := split $btnInfoStr "," -}}
-        {{- $btnID := index $btnInfo 0 -}}
-        {{- $faIcon := index $btnInfo 1 -}}
-        <button id="{{$btnID}}" title="{{i18n $btnID .}}" type="button" class="col-md-{{len $myButtons}} btn btn-outline-primary"><i class="fas {{$faIcon}} fa-3x"></i></button>
-      {{end}}
-    </section>
-
     <section title="Input Area" class="row justify-content-center">
       {{- /*
         https://developer.mozilla.org/en-US/docs/Web/HTML/Element/input/file
@@ -35,6 +26,16 @@
       <label for="inputStaticDir" class="col-md-10 form-label">{{i18n "Label.InputStaticDir" (dict "Options" (printf " (%s)" (i18n "FullPath" .)))}}
         <input class="form-control" id="inputStaticDir"/>
       </label>
+    </section>
+
+    <section title="buttons" class="row">
+      {{- $myButtons := (Slice "Commit,fa-play-circle") -}}
+      {{- range $idx, $btnInfoStr := $myButtons -}}
+      {{- $btnInfo := split $btnInfoStr "," -}}
+      {{- $btnID := index $btnInfo 0 -}}
+      {{- $faIcon := index $btnInfo 1 -}}
+      <button id="{{$btnID}}" title="{{i18n $btnID .}}" type="button" class="offset-md-2 col-md-{{div 8 (len $myButtons) | floor}} btn btn-outline-primary"><i class="fas {{$faIcon}} fa-3x"></i></button>
+      {{end}}
     </section>
   </details>
 

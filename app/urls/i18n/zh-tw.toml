@@ -16,9 +16,6 @@ other="完整路徑"
 [About]
 other="關於"
 
-[ExitApp]
-other="關閉程式"
-
 [Commit]
 other="提交"
 
@@ -60,6 +57,16 @@ other="期待您再次使用！"
     other="新增一「欄」"
   [Label.DeleteWholeColumn]
     other="刪除一整「欄」"
+  [Label.CloseApp]
+    other="關閉程式"
+  [Label.Lang]
+    other="語言"
+
+[Lang]
+  [Lang.EN_US]
+    other="English"
+  [Lang.ZH_TW]
+    other="繁體中文"
 
 [Ask]
   [Ask.InputNewColumnName]

@@ -80,13 +80,16 @@ func funcHandler(w http.ResponseWriter, req *http.Request) {
         }
         // response, _ := http.Get(fmt.Sprintf("http://127.0.0.1:%s%s", app.Port, filePath)) // 返回整個HTML的頁面資料太大，不適合 /user/static/a8308a402c6f40f65ca720ef7c54ecf0/
         // bodyBytes, err := ioutil.ReadAll(response.Body)
-        extSlice := strings.Split(ext, ",")
+        var extSlice []interface{}
+        for _, v := range strings.Split(ext, ",") {
+            extSlice = append(extSlice, v)
+        }
         var fontsSlice []string
         err = filepath.Walk(dirInfo.Path + "/fonts", func(path string, info os.FileInfo, err error) error {
             if info.IsDir() {
                 return nil
             }
-            if utils.In(filepath.Ext(path)[1:], extSlice) { // ttf, woff, woff2 ...
+            if utils.In(filepath.Ext(path)[1:], extSlice...) { // ttf, woff, woff2 ...
                 fontsSlice = append(fontsSlice, filepath.Base(path))
             }
             return nil

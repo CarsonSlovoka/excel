@@ -906,14 +906,6 @@ async function onCommit() {
         // https://developer.mozilla.org/en-US/docs/Web/API/Fetch_API/Using_Fetch
         onCommit().then()
       }
-      aboutBtn.onclick = () => {
-        window.location.href = "/about/"
-      }
-      document.getElementById("ExitApp").onclick = () => {
-        window.location.href = "/shutdown/"
-      }
     }
   }
 )()
-
-

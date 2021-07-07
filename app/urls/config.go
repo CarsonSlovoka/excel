@@ -38,11 +38,11 @@ func init() {
                     lang = previousLang
                 }
 
-                var legalLangSet []string
+                var legalLangSet []interface{}
                 for curLang, _ := range i18nObj.messageFileMap {
                     legalLangSet = append(legalLangSet, curLang)
                 }
-                if !(utils.In(lang, legalLangSet)) {
+                if !(utils.In(lang, legalLangSet...)) {
                     outputMsg = append(outputMsg,
                         fmt.Sprintf(`{{i18n "Err.InputLangNotExist" (dict "Lang" "%s") | safeHTML}}`, lang),
                     )

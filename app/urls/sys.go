@@ -37,9 +37,17 @@ func init() {
             }
         }
 
+        baseCtx := Context{}
+        for k,v := range BaseContext {
+            baseCtx[k] = v
+        }
+        structSite := baseCtx["Site"].(Setting)
+        structSite.ShowNavbar = false
+        baseCtx["Site"] = structSite
+
         time.AfterFunc(time.Duration(5)*time.Second, exitHandler)
         // _, _ = w.Write([]byte("Close App."))
-        tmpl.contextSet = append([]Context{}, BaseContext, getLangContext(r))
+        tmpl.contextSet = append([]Context{}, baseCtx, getLangContext(r))
         tmpl.ServeHTTP(w, r)
     })
 }

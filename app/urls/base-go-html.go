@@ -8,8 +8,10 @@ import (
 
 type Setting struct {
     EnableBootstrap   bool
+    EnableTachyons    bool
     EnableFontawesome bool
     EnableJquery      bool
+    ShowNavbar        bool
     ShowFooter        bool
 }
 
@@ -19,7 +21,9 @@ var (
 
 func init() {
     SiteSetting = Setting{
-        EnableBootstrap: true, EnableJquery: true, EnableFontawesome: true, ShowFooter: true,
+        EnableBootstrap: true, EnableTachyons: true,
+        EnableJquery: true, EnableFontawesome: true,
+        ShowNavbar: true, ShowFooter: true,
     }
 }
 

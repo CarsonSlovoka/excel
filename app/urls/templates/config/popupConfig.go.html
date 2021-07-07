@@ -34,4 +34,10 @@
       }
     }
   }
+
+  (()=>{
+    window.addEventListener("load", ()=>{
+      initPopupConfig() // Set the action of the close.
+    }, {once: true})
+  })()
 </script>
