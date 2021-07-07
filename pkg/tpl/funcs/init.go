@@ -16,5 +16,19 @@ func GetUtilsFuncMap() template.FuncMap {
         "safeJS":       JS,
         "safeJSStr":    JSStr,
         "safeURL":      URL,
+
+        // 👇 Math
+        "add":          Add,
+        "sub":          Sub,
+        "mul":          Mul,
+        "div":          Div,
+        "ceil":         Ceil,
+        "floor":        Floor,
+        "log":          Log,
+        "sqrt":         Sqrt,
+        "mod":          Mod,
+        "modBool":      ModBool,
+        "pow":          Pow,
+        "round":        Round,
     }
 }
