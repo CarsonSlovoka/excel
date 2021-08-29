@@ -101,6 +101,8 @@ func funcHandler(w http.ResponseWriter, req *http.Request) {
         w.Header().Set("Content-Type", "application/json; charset=utf-8")
         byteData, _ := json.Marshal(fontsSlice)
         _, _ = w.Write(byteData)
+    case "github/repos/": // get github repo contents
+        // https://stackoverflow.com/questions/59355889/possible-to-request-github-json-file-without-token/68033714#68033714
 
     default:
         http2.ShowErrorRequest(w, http.StatusBadRequest, "wrong function name!")
@@ -130,4 +132,5 @@ func init() {
     // apiRouter.HandleFunc("/{package:(?:os|path)}/{funName}", funcHandler).Methods("GET", "POST")
 
     apiRouter.HandleFunc("/path/filepath/{funName}", funcHandler).Methods("GET", "POST")
+    apiRouter.HandleFunc("/github/{apiName}", funcHandler).Methods("GET", "POST")
 }
