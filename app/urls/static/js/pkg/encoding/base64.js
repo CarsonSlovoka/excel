@@ -21,8 +21,8 @@ function fromBinary(binary) {
  * @param str {string}
  * @returns {string}
  * @example
- *  - btoa(toBinary("☸☹☺☻☼☾☿"))
- *  - Str2base64("☸☹☺☻☼☾☿")
+ *  - btoa(toBinary("☸☹☺☻☼☾☿")) // OCY5JjomOyY8Jj4mPyY=
+ *  - EncodeToString("☸☹☺☻☼☾☿") // OCY5JjomOyY8Jj4mPyY=
  * @see https://developer.mozilla.org/en-US/docs/Web/API/WindowOrWorkerGlobalScope/btoa#unicode_strings
  */
 export function EncodeToString(str) {
@@ -36,9 +36,9 @@ export function EncodeToString(str) {
  * @param base64 {string}
  * @returns {string}
  * @example
- *  - Base642Str("OCY5JjomOyY8Jj4mPyY=")
+ *  - DecodeString("OCY5JjomOyY8Jj4mPyY=") // ☸☹☺☻☼☾☿
  * @see https://developer.mozilla.org/en-US/docs/Web/API/WindowOrWorkerGlobalScope/btoa#unicode_strings
  */
 export function DecodeString(base64) {
-  return fromBinary(atob("OCY5JjomOyY8Jj4mPyY="))
+  return fromBinary(atob(base64))
 }
