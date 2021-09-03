@@ -118,7 +118,8 @@ class BSTable {
       return []
     }
     const formData = new FormData()
-    formData.set("para", JSON.stringify(this.staticInfo.dirInfo))
+    // formData.set("para", JSON.stringify(this.staticInfo.dirInfo)) // send the dirpath are enough.
+    formData.set("dirPath", this.staticInfo.dirInfo.Path + "\\fonts\\")
     const response = await fetch("/api/path/filepath/Glob?ext=ttf,woff,woff2", {
       method: "post",
       body: formData

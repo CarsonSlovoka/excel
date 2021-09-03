@@ -65,15 +65,18 @@ func funcHandler(w http.ResponseWriter, req *http.Request) {
             _, _ = w.Write(byteData)
         }
     case "path/filepath/Glob":
-        para, err := getFirstValue(mapVal, "para")
+        dirPath, err := getFirstValue(mapVal, "dirPath")
         if err != nil {
             http2.ShowErrorRequest(w, http.StatusBadRequest, err.Error())
         }
-        var dirInfo FileInfo
-        if err := json.Unmarshal([]byte(para), &dirInfo); err != nil {
-            http2.ShowErrorRequest(w, http.StatusBadRequest, err.Error())
-            return
-        }
+
+        /*
+           var dirInfo FileInfo
+           if err := json.Unmarshal([]byte(para), &dirInfo); err != nil {
+               http2.ShowErrorRequest(w, http.StatusBadRequest, err.Error())
+               return
+           }
+        */
         ext := req.FormValue("ext")
         if ext == "" {
             ext = "woff,woff2"
@@ -85,7 +88,7 @@ func funcHandler(w http.ResponseWriter, req *http.Request) {
             extSlice = append(extSlice, v)
         }
         var fontsSlice []string
-        err = filepath.Walk(dirInfo.Path + "/fonts", func(path string, info os.FileInfo, err error) error {
+        err = filepath.Walk(dirPath, func(path string, info os.FileInfo, err error) error {
             if info.IsDir() {
                 return nil
             }
