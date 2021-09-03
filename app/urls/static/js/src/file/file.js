@@ -900,13 +900,16 @@ async function onCommit() {
   () => {
     window.onload = () => {
       // document.getElementById("uploadFile").onchange = () => {}
-      const commitBtn = document.getElementById("Commit")
+      // const commitBtn = document.getElementById("Commit")
       const aboutBtn = document.getElementById("About")
-      commitBtn.onclick = () => {
+
+      $("form").submit(e => {
+        e.preventDefault()
         // https://developer.mozilla.org/en-US/docs/Learn/JavaScript/Asynchronous/Async_await
         // https://developer.mozilla.org/en-US/docs/Web/API/Fetch_API/Using_Fetch
         onCommit().then()
-      }
+        return false // Control submit behavior by myself.
+      })
     }
   }
 )()
