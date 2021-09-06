@@ -1,5 +1,6 @@
 import * as base64 from "../../pkg/encoding/base64.js"
 import {ReadFile} from "../../pkg/io/ioutil.js"
+import {AskInputFile} from "../../pkg/input/ask-file.js"
 
 const IFRAME_ID = "iframe-bootstrap-table"
 const UNIQUE_ID = "__id__"
@@ -899,8 +900,8 @@ async function onCommit() {
 (
   () => {
     window.onload = () => {
-      // document.getElementById("uploadFile").onchange = () => {}
-      // const commitBtn = document.getElementById("Commit")
+      new AskInputFile(document.querySelector(`#uploadFile`))
+
       const aboutBtn = document.getElementById("About")
 
       $("form").submit(e => {

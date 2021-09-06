@@ -18,9 +18,9 @@
     <form> <!-- onsubmit="return false;" -->
       <fieldset class="row justify-content-center">
           <legend></legend>
-          <label for="uploadFile" class="col-md-10 form-label">{{i18n "Label.SelectFile" (dict "Type" "CSV")}}
-            <input class="form-control" type="file" id="uploadFile" accept=".csv"/>
-          </label>
+
+          <input data-com="ask-file" data-label-class="col-md-10" id="uploadFile" accept="text/csv,application/vnd.ms-excel" placeholder='{{i18n "Label.SelectFile" (dict "Type" "CSV")}}'/>
+
           <label for="inputStaticDir" class="col-md-10 form-label">{{i18n "Label.InputStaticDir" (dict "Options" (printf " (%s)" (i18n "FullPath" .)))}}
             <input class="form-control" id="inputStaticDir"/>
           </label>
