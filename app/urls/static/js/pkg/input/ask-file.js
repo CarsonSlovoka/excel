@@ -37,7 +37,7 @@ export class AskInputFile {
 
       for (let i = 0; i < dragEvent.dataTransfer.files.length; i++) {
         const file = dragEvent.dataTransfer.files[i]
-        if (!input.accept.split(",").includes(file.type)) {
+        if (input.accept !== "" && !input.accept.split(",").includes(file.type)) {
           throw new Error(`Invalid file format: ${file.type}. ${input.accept} expected.`)
         }
       }
