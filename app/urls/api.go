@@ -4,10 +4,13 @@ import (
     "encoding/json"
     "errors"
     "github.com/CarsonSlovoka/excel/app/server"
+    "github.com/CarsonSlovoka/excel/pkg/github"
     http2 "github.com/CarsonSlovoka/excel/pkg/net/http"
     "github.com/CarsonSlovoka/excel/pkg/utils"
+    "io/ioutil"
     "net/http"
     "os"
+    "path"
     "path/filepath"
     "strings"
     "time"
@@ -104,6 +107,46 @@ func funcHandler(w http.ResponseWriter, req *http.Request) {
         w.Header().Set("Content-Type", "application/json; charset=utf-8")
         byteData, _ := json.Marshal(fontsSlice)
         _, _ = w.Write(byteData)
+    case "github/repos/": // get github repo contents
+        // https://stackoverflow.com/questions/59355889/possible-to-request-github-json-file-without-token/68033714#68033714
+        // github
+        para, err := getFirstValue(mapVal, "para")
+        if err != nil {
+            http2.ShowErrorRequest(w, http.StatusBadRequest, err.Error())
+        }
+        var queryInfo github.QueryInfo
+        if err := json.Unmarshal([]byte(para), &queryInfo); err != nil {
+            http2.ShowErrorRequest(w, http.StatusBadRequest, err.Error())
+            return
+        }
+
+        //
+        // dataBytes, _ := json.Marshal(map[string]string{"name": "Carson", "Age": ""})
+        // resp, err := http.Post("https://httpbin.org/post", "application/json", bytes.NewBuffer(dataBytes))
+
+        url := path.Join("https://api.github.com/repos/", queryInfo.Owner, queryInfo.Repo, "contents", queryInfo.Path) + "?ref=" + queryInfo.Branch
+        request, _ := http.NewRequest("GET", url, nil)
+        request.Header.Set("accept", "application/vnd.github.v3.raw")
+        if queryInfo.Token != "" {
+            request.Header.Set("authorization", "token "+queryInfo.Token)
+        }
+
+        response, err := (&http.Client{}).Do(request)
+
+        if err != nil {
+            http2.ShowErrorRequest(w, http.StatusBadRequest, err.Error())
+            return
+        }
+
+        defer func() {
+            _ = response.Body.Close()
+        }()
+
+        // w.Header().Set("Content-Type", "application/json; charset=utf-8")
+        byteData, _ := ioutil.ReadAll(response.Body)
+        _, _ = w.Write(byteData)
+
+
 
     default:
         http2.ShowErrorRequest(w, http.StatusBadRequest, "wrong function name!")
