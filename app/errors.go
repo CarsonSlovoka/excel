@@ -5,11 +5,11 @@ import "errors"
 var ErrCode errorCode
 
 type errorCode struct {
-    SecureCookieDecodeError error
+	SecureCookieDecodeError error
 }
 
 func init() {
-    ErrCode = errorCode{
-        errors.New("secureCookie decode error"),
-    }
+	ErrCode = errorCode{
+		errors.New("secureCookie decode error"),
+	}
 }

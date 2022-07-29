@@ -1,13 +1,13 @@
-# EditorConfig is awesome: https://EditorConfig.org
+# https://EditorConfig.org
 
-root = true  # A search for .editorconfig files will stop if the root filepath is reached or an EditorConfig file with root=true is found.
+root = true # search for .editorconfig files will stop if the root filepath is reached or an EditorConfig file with root=true is found.
 
 # Unix-style newlines with a newline ending every file
 [*]
 charset = utf-8
 
 # Line endings
-end_of_line = crlf # set to lf, cr, or crlf to control how line breaks are represented.
+end_of_line = lf # set to lf, cr, or crlf to control how line breaks are represented.
 insert_final_newline = true # set to true to ensure file ends with a newline
 trim_trailing_whitespace = true # set to true to remove any whitespace characters preceding newline characters and false to ensure it doesn't.
 
@@ -18,15 +18,17 @@ trim_trailing_whitespace = true # set to true to remove any whitespace character
 indent_size = 4
 indent_style = space
 
-[*.{puml, nsi, nsh}]
+[*.bat]
+end_of_line = crlf
+
+[*.{go, puml, nsi, nsh, Makefile, mk}]
 indent_style = tab
 
-[*.{yml, yaml, json, js, css, html, toml}]
+
+[*.{md, yml, yaml, json, js, css, html, gohtml, gotmpl, toml, scss, sass, xml}]
 indent_size = 2
 
-[*.{md, markdown}]
+[*.{md, markdown, html}]
 max_line_length = off
 
 # [*.other]
-
-
