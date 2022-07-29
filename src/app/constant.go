@@ -4,7 +4,10 @@ const (
 	ProgName = "GreenViewer"
 	Author   = "Carson"
 	Version  = "0.0.0"
-	Port     = "7121"
+)
+
+var (
+	Port string
 )
 
 func init() {
